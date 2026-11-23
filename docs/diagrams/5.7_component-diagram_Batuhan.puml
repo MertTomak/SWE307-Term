@@ -1,0 +1,66 @@
+@startuml 5.7_component-diagram_Batuhan
+' 5.7 UML Component diagram - CampusSlot
+' Owner: Batuhan (System Architect). Text: docs/report/5.7_component-deployment_Batuhan.md
+title CampusSlot - UML Component Diagram
+skinparam shadowing false
+skinparam componentStyle uml2
+
+component "Web Client (React SPA)" as Web {
+  component "Pages" as Pages
+  component "AuthModule" as AuthM
+  component "QrScanner" as Qr
+  component "ApiClient" as ApiC
+}
+
+interface "REST API /api/v1\n(JSON, Bearer JWT)" as REST
+
+component "CampusSlot API (Node.js + Express)" as Api {
+  component "HttpLayer\n(routes, controllers,\nmiddleware)" as Http
+  component "AuthService" as AuthS
+  component "ResourceService" as ResS
+  component "ReservationService" as RsvS
+  component "CheckInService" as ChkS
+  component "NotificationService" as NotS
+  component "ReportService" as RepS
+  component "Domain\n(rules R1-R4,\nReservationStateMachine,\ntime windows)" as Dom
+  component "Repositories" as Repo
+  component "SystemScheduler\n(jobs J1-J4)" as Sched
+}
+
+interface "SQL (PostgreSQL protocol, TLS)" as SQL
+database "PostgreSQL" as DB
+
+' Web client
+Pages ..> AuthM : use
+Pages ..> Qr : use
+Pages ..> ApiC : use
+AuthM ..> ApiC : use
+
+' Provided and required interface
+REST - Http
+ApiC ..> REST : require
+
+' Inside the API
+Http ..> AuthS
+Http ..> ResS
+Http ..> RsvS
+Http ..> ChkS
+Http ..> NotS
+Http ..> RepS
+Sched ..> RsvS : J1, J2, J3
+Sched ..> NotS : J4
+RsvS ..> NotS
+ChkS ..> NotS
+RsvS ..> Dom
+ChkS ..> Dom
+AuthS ..> Repo
+ResS ..> Repo
+RsvS ..> Repo
+ChkS ..> Repo
+NotS ..> Repo
+RepS ..> Repo
+
+' Database
+SQL - DB
+Repo ..> SQL : require (Prisma Client)
+@enduml

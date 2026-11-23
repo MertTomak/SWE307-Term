@@ -1,0 +1,53 @@
+@startuml 5.7_deployment-diagram_Batuhan
+' 5.7 UML Deployment diagram - CampusSlot (pilot / demo setup = 5.11 Scenario A)
+' Owner: Batuhan (System Architect). Text: docs/report/5.7_component-deployment_Batuhan.md
+title CampusSlot - UML Deployment Diagram (pilot setup, 5.11 Scenario A)
+skinparam shadowing false
+
+node "User device\n<<device>>\nphone or computer" as Device {
+  node "Web browser\n<<execution environment>>" as Browser {
+    artifact "CampusSlot SPA\n(running copy of frontend/dist)" as SpaRun
+  }
+  node "Camera\n<<device>>" as Camera
+}
+
+node "Vercel\n<<static hosting, CDN>>" as Vercel {
+  artifact "frontend/dist\nindex.html, JS, CSS" as Dist
+}
+
+node "Render web service\n<<server>>" as Render {
+  node "Node.js >= 20.19\n<<execution environment>>" as NodeEnv {
+    artifact "campusslot-backend\nExpress API + SystemScheduler" as BackendArt
+  }
+}
+
+node "Neon\n<<database server>>" as Neon {
+  database "PostgreSQL\ncampusslot" as PG
+}
+
+node "GitHub\n<<source repository>>" as GitHub {
+  artifact "MertTomak/SWE307-Term\n(main branch)" as Repo
+}
+
+Browser -- Vercel : HTTPS\n(load the SPA)
+Browser -- Render : HTTPS\nREST /api/v1, JSON, Bearer JWT
+Browser -- Camera : camera access\n(secure context only)
+NodeEnv -- Neon : PostgreSQL protocol over TLS\n(DATABASE_URL)
+GitHub ..> Vercel : <<build and deploy>>\nfrontend/ on push to main
+GitHub ..> Render : <<build and deploy>>\nbackend/ on push to main
+
+note right of Render
+  Environment: DATABASE_URL, JWT_SECRET,
+  CORS_ORIGIN (Vercel URL), PORT.
+  The SystemScheduler runs in this process
+  every 60 s (5.8.4.9).
+  Free tier: spins down after 15 min without
+  traffic (5.11). While asleep the scheduler
+  pauses; it catches up on the next start.
+end note
+
+note bottom of Neon
+  Free tier scales to zero after 5 min idle (5.11);
+  the first query after that is slower.
+end note
+@enduml

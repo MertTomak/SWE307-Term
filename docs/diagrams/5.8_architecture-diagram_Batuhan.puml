@@ -1,0 +1,67 @@
+@startuml 5.8_architecture-diagram_Batuhan
+' 5.8 Overall architecture - CampusSlot layered architecture
+' Owner: Batuhan (System Architect). Text: docs/report/5.8_architecture-stack_Batuhan.md
+title CampusSlot - Layered Architecture
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam defaultTextAlignment center
+top to bottom direction
+
+actor "Campus User\n(Student, Academic Staff)" as CU
+actor "Resource Admin" as RA
+
+package "Presentation layer\nReact SPA (frontend/src)" as PL {
+  [Pages\nsearch, reservation, my reservations,\ncheck-in (QR camera / 6-digit code), admin] as Pages
+  [Auth module\nAuthProvider, RequireRole] as AuthUI
+  [API client\napi/endpoints.ts, client.ts, types.ts] as ApiClient
+}
+
+package "Application layer\nExpress REST API (backend/src/http, services, jobs)" as AL {
+  [Routes + middleware\nrequireAuth, requireRole, validate (zod),\nrate limit, error handler] as MW
+  [Controllers\nAuth, Resource, Reservation,\nCheckIn, Notification, Admin] as Ctrl
+  [Services\nAuth, Resource, Reservation, CheckIn,\nNotification, Report] as Svc
+  [System Scheduler jobs (every 60 s)\nJ1 no-show + penalty, J2 complete,\nJ3 auto-reject, J4 reminder] as Jobs
+}
+
+package "Domain layer\nbusiness rules (backend/src/domain)" as DL {
+  [Reservation rules R1-R4\n(Strategy: one validator per rule)] as Rules
+  [ReservationStateMachine\n(State: 7 statuses, R5-R8)] as SM
+  [Time windows\nR6 cancel, R7 check-in, R8 no-show, R9 30 days] as TW
+}
+
+package "Data layer\n(backend/src/repositories, Prisma)" as DAL {
+  [Repositories\nUser, Resource, Reservation,\nCheckIn, Penalty, Notification] as Repo
+  [Prisma Client 7\n(driver adapter: pg)] as Prisma
+}
+
+database "PostgreSQL\nUser, Resource, Reservation,\nCheckIn, Penalty, Notification" as DB
+
+CU --> Pages : HTTPS (browser)
+RA --> Pages : HTTPS (browser)
+Pages --> AuthUI
+Pages --> ApiClient
+ApiClient --> MW : REST / JSON over HTTPS\n/api/v1, Bearer JWT
+MW --> Ctrl
+Ctrl --> Svc
+Jobs --> Svc : same services as HTTP
+Svc --> Rules
+Svc --> SM
+Svc --> TW
+Svc --> Repo
+Repo --> Prisma
+Prisma --> DB : SQL over TLS
+
+note right of DL
+  No Express, no Prisma here.
+  Unit-testable without a server
+  or a database (NFR-21).
+end note
+
+note right of Jobs
+  Second entry point next to HTTP.
+  Conditional updates: never processes
+  a reservation twice; catches up
+  after a restart (NFR-14).
+end note
+@enduml
