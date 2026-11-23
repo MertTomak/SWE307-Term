@@ -1,0 +1,69 @@
+@startwbs
+* CampusSlot Project
+** 1.0 Project Management
+*** 1.1 Planning and Control
+**** 1.1.1 Project plan, WBS, PERT, Gantt (Mert)
+**** 1.1.2 Sprint planning, reviews, retrospectives (Mert)
+**** 1.1.3 Risk and status tracking (Mert)
+*** 1.2 Estimation and Value
+**** 1.2.1 FPA and COCOMO estimation (Mert)
+**** 1.2.2 Feasibility analysis, 5.10 (Mert)
+**** 1.2.3 Value and benefit analysis, cost-benefit Excel, 5.11 (Mert)
+*** 1.3 Repository and Tools
+**** 1.3.1 GitHub repo and project skeleton (Batuhan)
+**** 1.3.2 Group registration, shared folder, report skeleton, task board (Mert)
+** 2.0 Analysis
+*** 2.1 Fact-Finding
+**** 2.1.1 Survey, two interviews, observation, document review (Zeynep)
+**** 2.1.2 Literature review, 5.3 (Arzum)
+*** 2.2 Requirements
+**** 2.2.1 FR and NFR specification, user stories (Zeynep)
+**** 2.2.2 Use case descriptions UC-01 to UC-10 (Zeynep)
+*** 2.3 Analysis Models
+**** 2.3.1 Fishbone and DFD Context, Level 0, Level 1 (Zeynep)
+**** 2.3.2 Use case diagram and decision table (Görkem)
+**** 2.3.3 Activity diagrams (Arzum)
+** 3.0 Design
+*** 3.1 Architecture
+**** 3.1.1 Architecture, component and deployment diagrams (Batuhan)
+**** 3.1.2 REST API contract, security and KVKK (Batuhan)
+*** 3.2 Data and Class Design
+**** 3.2.1 Class diagram and ERD (Erol)
+**** 3.2.2 Prisma schema and migrations (Erol)
+*** 3.3 UX Design
+**** 3.3.1 Wireframes (Arzum)
+**** 3.3.2 Screen designs and style guide (Arzum)
+*** 3.4 Dynamic Design
+**** 3.4.1 Sequence and state machine diagrams (Enes)
+** 4.0 Implementation
+*** 4.1 Backend
+**** 4.1.1 Scaffold, auth and RBAC, F1 (Erol)
+**** 4.1.2 Resource and availability APIs, F2, F8 (Erol)
+**** 4.1.3 Reservation engine R1-R6, notifications, F3, F4, F7 (Erol)
+**** 4.1.4 QR check-in, no-show scheduler, penalties, F5, F6 (Erol)
+*** 4.2 Frontend
+**** 4.2.1 Scaffold, auth, search and calendar pages (Enes)
+**** 4.2.2 Reservation, My Reservations, QR scan pages (Enes)
+**** 4.2.3 Admin panel and reports (Enes)
+*** 4.3 Integration
+**** 4.3.1 Frontend-backend integration and bug fixing (Enes, Erol)
+**** 4.3.2 Code freeze, 1 Dec (Mert)
+** 5.0 Testing
+*** 5.1 Test Planning
+**** 5.1.1 Test plan and test cases TC-01... (Görkem)
+*** 5.2 Test Execution
+**** 5.2.1 Backend API unit and integration tests (Görkem)
+**** 5.2.2 System, E2E and regression tests (Görkem)
+*** 5.3 Test Reporting
+**** 5.3.1 Test results and screenshots for 5.12 (Görkem)
+** 6.0 Delivery
+*** 6.1 Report
+**** 6.1.1 Drafting of report sections 5.2-5.9 (section authors)
+**** 6.1.2 Report integration and single PDF, 4 Dec (Mert)
+*** 6.2 Presentation
+**** 6.2.1 Slide template and 2-minute video (Arzum)
+**** 6.2.2 Merging slides, content from all members (Mert)
+*** 6.3 Submission
+**** 6.3.1 Deployment and demo backup (Görkem)
+**** 6.3.2 GitHub link, running app, final check (Mert)
+@endwbs
