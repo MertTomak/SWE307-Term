@@ -1,9 +1,12 @@
 @startuml 5.7_component-diagram_Batuhan
 ' 5.7 UML Component diagram - CampusSlot
 ' Owner: Batuhan (System Architect). Text: docs/report/5.7_component-deployment_Batuhan.md
+' Render: java -jar plantuml.jar -Playout=smetana -tpng <this file>
 title CampusSlot - UML Component Diagram
 skinparam shadowing false
 skinparam componentStyle uml2
+skinparam nodesep 40
+skinparam ranksep 50
 
 component "Web Client (React SPA)" as Web {
   component "Pages" as Pages
@@ -15,19 +18,21 @@ component "Web Client (React SPA)" as Web {
 interface "REST API /api/v1\n(JSON, Bearer JWT)" as REST
 
 component "CampusSlot API (Node.js + Express)" as Api {
-  component "HttpLayer\n(routes, controllers,\nmiddleware)" as Http
-  component "AuthService" as AuthS
-  component "ResourceService" as ResS
-  component "ReservationService" as RsvS
-  component "CheckInService" as ChkS
-  component "NotificationService" as NotS
-  component "ReportService" as RepS
-  component "Domain\n(rules R1-R4,\nReservationStateMachine,\ntime windows)" as Dom
+  component "HttpLayer\n(routes, controllers, middleware)" as Http
+  component "SystemScheduler\n(jobs J1-J4, every 60 s)" as Sched
+  component "Application services" as Svc {
+    component "AuthService" as AuthS
+    component "ResourceService" as ResS
+    component "ReservationService" as RsvS
+    component "CheckInService" as ChkS
+    component "ReportService" as RepS
+    component "NotificationService" as NotS
+  }
+  component "Domain\n(rules R1-R4,\nReservationStateMachine,\ntime windows R6-R9)" as Dom
   component "Repositories" as Repo
-  component "SystemScheduler\n(jobs J1-J4)" as Sched
 }
 
-interface "SQL (PostgreSQL protocol, TLS)" as SQL
+interface "SQL\n(PostgreSQL protocol, TLS)" as SQL
 database "PostgreSQL" as DB
 
 ' Web client
@@ -37,30 +42,23 @@ Pages ..> ApiC : use
 AuthM ..> ApiC : use
 
 ' Provided and required interface
-REST - Http
 ApiC ..> REST : require
+REST -- Http
 
 ' Inside the API
-Http ..> AuthS
-Http ..> ResS
-Http ..> RsvS
-Http ..> ChkS
-Http ..> NotS
-Http ..> RepS
-Sched ..> RsvS : J1, J2, J3
-Sched ..> NotS : J4
+Http ..> Svc : call
+Sched ..> Svc : J1-J4
 RsvS ..> NotS
 ChkS ..> NotS
-RsvS ..> Dom
-ChkS ..> Dom
-AuthS ..> Repo
-ResS ..> Repo
-RsvS ..> Repo
-ChkS ..> Repo
-NotS ..> Repo
-RepS ..> Repo
+Svc ..> Dom : check rules
+Svc ..> Repo : read / write
 
 ' Database
-SQL - DB
-Repo ..> SQL : require (Prisma Client)
+Repo ..> SQL : require\n(Prisma Client)
+SQL -- DB
+
+legend bottom
+  Every service uses Repositories. ReservationService and CheckInService
+  also use Domain and NotificationService. Domain imports no Express or Prisma (5.8.1).
+endlegend
 @enduml
