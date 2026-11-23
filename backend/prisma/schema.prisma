@@ -1,0 +1,173 @@
+// CampusSlot — Campus Resource Reservation and QR Check-in System
+// Prisma schema (PostgreSQL), Prisma ORM 7
+// Owner: Erol (Backend Developer)
+//
+// The connection URL is not set here. Prisma 7 reads it from
+// backend/prisma.config.ts (datasource.url = env("DATABASE_URL")).
+//
+// Business rules that the database itself enforces are marked [DB].
+// Rules enforced in the service layer are marked [SVC].
+//   R1 max 3 hours ..................... [SVC]
+//   R2 active reservation limit ........ [SVC] Student 2, Academic Staff 5
+//   R3 no overlap on same resource ..... [SVC]
+//   R4 active penalty blocks booking ... [SVC] via Penalty.startsAt / endsAt
+//   R5 EQUIPMENT -> PENDING_APPROVAL ... [SVC]
+//   R6 cancel until start time ......... [SVC]
+//   R7 check-in window -10 / +15 min ... [SVC]
+//   R8 no check-in after +15 -> NO_SHOW  [SVC] System Scheduler job
+//   R9 3 NO_SHOW in 30 days -> 7 days .. [SVC] System Scheduler job
+//   One check-in per reservation ....... [DB] CheckIn.reservationId @unique
+//   Unique door codes .................. [DB] Resource.qrToken / checkInCode @unique
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────── Enums (values exactly as in the project card) ─────────────
+
+enum Role {
+  STUDENT
+  ACADEMIC_STAFF
+  RESOURCE_ADMIN
+}
+
+enum ResourceType {
+  ROOM
+  LAB
+  EQUIPMENT
+}
+
+enum ReservationStatus {
+  PENDING_APPROVAL
+  CONFIRMED
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+  REJECTED
+}
+
+// How the user proved presence at the door (QR scan, or typed 6-digit code
+// when the camera does not open).
+enum CheckInMethod {
+  QR_SCAN
+  MANUAL_CODE
+}
+
+// In-app notification kinds (F4). Not fixed by the project card; proposed here.
+enum NotificationType {
+  RESERVATION_CONFIRMED
+  RESERVATION_PENDING
+  RESERVATION_APPROVED
+  RESERVATION_REJECTED
+  RESERVATION_CANCELLED
+  CHECK_IN_REMINDER
+  NO_SHOW_RECORDED
+  PENALTY_APPLIED
+}
+
+// ───────────── Models (names exactly as in the project card) ─────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  role         Role
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  reservations        Reservation[]  @relation("ReservationOwner")
+  decidedReservations Reservation[]  @relation("ReservationDecider")
+  penalties           Penalty[]
+  notifications       Notification[]
+}
+
+model Resource {
+  id          String       @id @default(uuid())
+  name        String
+  type        ResourceType
+  location    String
+  capacity    Int? // people; null for EQUIPMENT
+  description String?
+  qrToken     String       @unique // value encoded in the door QR code
+  checkInCode String       @unique @db.Char(6) // 6-digit fallback code under the QR
+  isActive    Boolean      @default(true) // admin can deactivate instead of delete (F8)
+  createdAt   DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime     @updatedAt @db.Timestamptz(3)
+
+  reservations Reservation[]
+
+  @@index([type, isActive])
+}
+
+model Reservation {
+  id         String            @id @default(uuid())
+  userId     String
+  resourceId String
+  startTime  DateTime          @db.Timestamptz(3)
+  endTime    DateTime          @db.Timestamptz(3)
+  status     ReservationStatus
+  purpose    String?
+
+  // R5: admin decision on EQUIPMENT reservations (F7)
+  decidedById     String?
+  decidedAt       DateTime? @db.Timestamptz(3)
+  rejectionReason String?
+
+  cancelledAt DateTime? @db.Timestamptz(3) // R6
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(3)
+
+  user          User           @relation("ReservationOwner", fields: [userId], references: [id], onDelete: Restrict)
+  resource      Resource       @relation(fields: [resourceId], references: [id], onDelete: Restrict)
+  decidedBy     User?          @relation("ReservationDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  checkIn       CheckIn?
+  notifications Notification[]
+
+  @@index([resourceId, startTime, endTime]) // R3 overlap check, availability calendar (F2)
+  @@index([userId, status, startTime]) // R2 active count, My Reservations (F4)
+  @@index([status, startTime]) // R8 scheduler scan, reports (F8)
+}
+
+model CheckIn {
+  id            String        @id @default(uuid())
+  reservationId String        @unique
+  checkedInAt   DateTime      @default(now()) @db.Timestamptz(3)
+  method        CheckInMethod
+
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+}
+
+model Penalty {
+  id          String   @id @default(uuid())
+  userId      String
+  reason      String // e.g. "3 NO_SHOW in last 30 days" (R9)
+  noShowCount Int // number of NO_SHOWs that triggered it
+  startsAt    DateTime @db.Timestamptz(3)
+  endsAt      DateTime @db.Timestamptz(3) // startsAt + 7 days (R9)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, endsAt]) // R4: "is there a penalty with endsAt > now?"
+}
+
+model Notification {
+  id            String           @id @default(uuid())
+  userId        String
+  reservationId String?
+  type          NotificationType
+  message       String
+  isRead        Boolean          @default(false)
+  createdAt     DateTime         @default(now()) @db.Timestamptz(3)
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reservation Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+
+  @@index([userId, isRead, createdAt])
+}
