@@ -1,0 +1,58 @@
+@startuml 5.7_state-machine-diagram_Enes
+' 5.7 UML State Machine diagram - Reservation - CampusSlot
+' Owner: Enes (Frontend Developer). Text: docs/report/5.7_state-machine_Enes.md
+' Sources: project card (states, R1-R9), 5.4 (FR-18/19, FR-25/26, FR-34/35, FR-38/39, FR-30, FR-45 to FR-47, FR-55, D1-D4),
+'          5.8.4.7 rule chain, 5.8.4.8 check-in logic, 5.8.4.9 scheduler jobs J1-J4.
+' State names = enum ReservationStatus in backend/prisma/schema.prisma.
+' Render: java -jar plantuml.jar -Playout=smetana -tpng <this file>
+title CampusSlot - UML State Machine Diagram: Reservation
+skinparam shadowing false
+skinparam defaultFontSize 12
+
+state "R5" as R5choice <<choice>>
+
+state PENDING_APPROVAL
+state CONFIRMED : J4 when now >= startTime - 10 min\n/ notify CHECK_IN_REMINDER (once)
+state CHECKED_IN : entry / create CheckIn (checkedInAt, method)
+state COMPLETED
+state CANCELLED : entry / set cancelledAt,\nnotify RESERVATION_CANCELLED
+state NO_SHOW
+state REJECTED : entry / set rejectionReason,\nnotify RESERVATION_REJECTED
+
+[*] --> R5choice : create(resourceId, startTime, endTime, purpose) (E07)\n[R1, R4, R2, R3 pass]
+R5choice --> PENDING_APPROVAL : [resource.type = EQUIPMENT]\n/ notify RESERVATION_PENDING
+R5choice --> CONFIRMED : [resource.type = ROOM or LAB]\n/ notify RESERVATION_CONFIRMED
+
+PENDING_APPROVAL --> CONFIRMED : approve (Resource Admin, E15)\n/ set decidedById, decidedAt,\nnotify RESERVATION_APPROVED
+PENDING_APPROVAL --> REJECTED : reject(reason) (Resource Admin, E16)\n/ set decidedById, decidedAt
+PENDING_APPROVAL --> REJECTED : J3 when now >= startTime (D4)\n/ reason "Not approved before the start time"
+PENDING_APPROVAL --> CANCELLED : cancel (owner, E10)\n[now < startTime] (R6)
+
+CONFIRMED --> CANCELLED : cancel (owner, E10)\n[now < startTime] (R6)
+CONFIRMED --> CHECKED_IN : checkIn(method, code) (E11)\n[code belongs to the resource and\nstartTime - 10 min <= now <= startTime + 15 min] (R7)
+CONFIRMED --> NO_SHOW : J1 when now > startTime + 15 min (R8)\n/ notify NO_SHOW_RECORDED; if >= 3 NO_SHOW\nin 30 days and no running penalty: create\n7-day Penalty, notify PENALTY_APPLIED (R9)
+
+CHECKED_IN --> COMPLETED : J2 when now >= endTime
+
+COMPLETED --> [*]
+CANCELLED --> [*]
+NO_SHOW --> [*]
+REJECTED --> [*]
+
+note right of PENDING_APPROVAL
+  Active (counts toward R2, D1):
+  PENDING_APPROVAL or CONFIRMED
+  with a start in the future.
+  Blocks the slot (R3, D2):
+  PENDING_APPROVAL, CONFIRMED,
+  CHECKED_IN.
+end note
+
+note bottom of NO_SHOW
+  CANCELLED, REJECTED and NO_SHOW free the slot
+  (FR-27, FR-48, FR-40). The four end states have
+  no outgoing event; the record is never deleted
+  (kept for R9 and the reports).
+end note
+
+@enduml
