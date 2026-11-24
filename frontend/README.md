@@ -27,3 +27,13 @@ React + Vite + TypeScript web client. Setup and run steps are in the [root READM
 5. Lists: show loading, empty and error states (task document, Enes item 3).
 6. Mobile first: check-in is used on a phone at the door.
 7. One branch and one pull request per screen, for example `enes/my-reservations`.
+
+## Mock API (until the backend is ready)
+
+The backend server is not built yet, so the screens can run against a fake API in the browser ([MSW](https://mswjs.io/), Mock Service Worker).
+
+- Switch: `VITE_USE_MOCKS=true` in `.env.local` (copied from `.env.example`). Works only in `npm run dev`; the production build never contains the mocks.
+- Fake answers: `src/mocks/handlers.ts`. They follow the API contract (paths, status codes, error codes, bodies), so a page does not change when the mocks are switched off. Endpoints without a handler go to the real API at `VITE_API_URL`.
+- Fake users: `src/mocks/db.ts` (one student, one academic staff, one admin; the test password is `MOCK_PASSWORD` in that file). Users registered in the app are kept in `sessionStorage` until the tab is closed.
+- Covered so far: E01 register, E02 log in (with the 5-failure rate limit), E03 current user.
+- When the backend runs: set `VITE_USE_MOCKS=false`.
