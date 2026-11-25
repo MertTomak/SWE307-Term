@@ -28,8 +28,10 @@ OUTPUT_PDF = REPORT_DIR / "CampusSlot_Report_DRAFT.pdf"
 # No LaTeX install assumed. Render via pandoc -> HTML -> headless Chrome print,
 # since every machine on the team already has Chrome but not pdflatex.
 CHROME_CANDIDATES = [
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    "google-chrome", "chromium", "chromium-browser",
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",  # macOS
+    r"C:\Program Files\Google\Chrome\Application\chrome.exe",  # Windows
+    r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",  # Windows, 32-bit install
+    "google-chrome", "google-chrome-stable", "chromium", "chromium-browser",  # Linux / PATH
 ]
 
 # (section id, display title, [files in this section, in order], owner, status)
