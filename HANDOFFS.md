@@ -10,7 +10,7 @@ One list of open hand-offs between team members, so nobody has to read the commi
 - Status values: `Open` · `In progress` · `Blocked` (say why in **What**).
 - Dates are from the plan in `docs/report/5.5_planning_Mert.md` and the task document. Overdue items are marked ⚠.
 
-Last updated: 24 Nov 2026 (Batuhan).
+Last updated: 25 Nov 2026 (Mert).
 
 ## Open
 
@@ -23,7 +23,8 @@ Last updated: 24 Nov 2026 (Batuhan).
 | H06 | Mert | Batuhan | 5.7 design patterns (checked against Erol's code). Component and Deployment diagrams (H21) and 5.8.5 security (H25) are done. | 27 Nov | Open | — |
 | H26 | Batuhan | Erol | Build the server controls in 5.8.5.2: role and ownership checks, `helmet`, `cors` with `CORS_ORIGIN`, rate limits, door codes from `crypto` (not `Math.random`), logging without passwords, tokens or codes. Contract change: password max 72 bytes in E01 (bcrypt limit). | 1 Dec | Open | 5.8.5.2, 5.8.5.3 |
 | H27 | Batuhan | Görkem | Security tests ST-01 to ST-15 for 5.12. Seed the demo database with a secret `SEED_PASSWORD`: the default `CampusSlot123!` in `seed.ts` is public on GitHub. Run `npm audit` before the freeze. | 1 Dec | Open | 5.8.5.6, SEC-O4 |
-| H28 | Batuhan | Mert | KVKK Art. 9 (transfer abroad) is not in 5.10.2. Render and Neon may store data outside Turkey. 5.8.5 decides that the pilot and demo use only fictional seed users; please add Art. 9 to 5.10.2 and ask the university about hosting, the privacy notice text and who receives deletion requests. | 27 Nov | Open | 5.8.5.5, SEC-O1 to SEC-O3 |
+| H29 | Batuhan, Enes | Mert | Follow-up to H28, the parts that need an answer from outside the team: SEC-O1 the server region of Render and Neon and whether real use needs hosting in Turkey; SEC-O2 who receives and answers Art. 11 requests within 30 days; SEC-O3 the exact privacy notice wording for the register page (Enes is blocked on the wording, not on the checkbox); and which Art. 5 legal basis the university relies on. | 1 Dec | Open | 5.10.2 "Questions for the university" |
+| H30 | — | Mert | Close the two unverified sources in 5.10.2 flagged `[TBD]`: (a) read the paragraph text of KVKK Art. 9 in a readable copy — the official PDF uses a font encoding that drops Turkish characters and could not be quoted; (b) confirm on kvkk.gov.tr whether the Board has issued any adequacy decision — the site failed TLS certificate verification on 25 Nov. An unverifiable reference counts as insufficient content under the grading rules. | 4 Dec (before the PDF) | Open | 5.10.2 |
 | H22 | Erol | Batuhan → Erol | Proposed backend folder structure and layer rule (Domain layer without Express or Prisma). Erol: say if you want other names; the 5.7 class diagram must follow the final code. | 25 Nov | Open | 5.8.1 in `docs/report/5.8_architecture-stack_Batuhan.md` |
 | H23 | Enes | Enes | Choose the QR scanning library and test it on the team's phones. `html5-qrcode` (suggested in the task document) was last published in April 2023; `@zxing/browser` is a maintained alternative. | 26 Nov | Open | 5.8.2 |
 | H24 | Mert, Görkem | Team | Demo hosting: free Render instance kept awake before the demo, or the paid instance (5.11 Scenario B) for the presentation week. The free instance sleeps, and the scheduler sleeps with it. | 1 Dec | Open | 5.7 Deployment, risks |
@@ -49,3 +50,4 @@ Last updated: 24 Nov 2026 (Batuhan).
 | H16 | Mert | Batuhan | Time zone for NFR-10: `Europe/Istanbul`, stored in UTC. | 23 Nov | 5.4 NFR-10; 5.8.4.1 |
 | H17 | Mert | Batuhan | Name, student ID and section in 5.13; AI usage row for 5.8 (API part). | 23 Nov | `docs/report/5.13-5.14_report-text_Mert.md` |
 | H18 | Batuhan, Enes | Erol | Prisma schema, initial migration and seed data. | 23 Nov | PR #4 |
+| H28 | Batuhan | Mert | KVKK Art. 9 (transfer abroad) added to 5.10.2: the three mechanisms in order (adequacy decision / appropriate safeguards / occasional transfer) from the implementing regulation of 10 July 2024, the standard-contract route and its five-business-day notification duty, why the occasional-transfer route does not cover ordinary hosting, and the recommendation to host in Turkey. The pilot decision from 5.8.5.5 (seed users only) is carried over. The questions that need the university are now H29; the two unverified sources are H30. | 25 Nov | 5.10.2 "Transfer of personal data abroad (Art. 9)" |
