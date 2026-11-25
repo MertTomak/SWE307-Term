@@ -46,9 +46,10 @@ MANIFEST = [
     ("5.5", "Software Process Model and Project Management",
      ["5.5_planning_Mert.md", "5.5_FPA-COCOMO_Mert.md"], "Mert", None),
     ("5.6", "Analysis Models",
-     [], "Zeynep / Görkem / Arzum",
-     "Not started: use case diagram (Görkem), user stories + DFDs (Zeynep), "
-     "activity diagram (Arzum, requested)."),
+     ["5.6_use-cases_Gorkem.md"], "Zeynep / Görkem / Arzum",
+     "Partial: use case diagram and descriptions done (Görkem). "
+     "Decision tables (Görkem), user stories + DFDs (Zeynep) and "
+     "activity diagram text (Arzum) still missing."),
     ("5.7", "Software Design",
      ["5.7_component-deployment_Batuhan.md", "5.7_state-machine_Enes.md"],
      "Batuhan / Enes / Erol",

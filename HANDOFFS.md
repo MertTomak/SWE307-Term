@@ -10,7 +10,7 @@ One list of open hand-offs between team members, so nobody has to read the commi
 - Status values: `Open` · `In progress` · `Blocked` (say why in **What**).
 - Dates are from the plan in `docs/report/5.5_planning_Mert.md` and the task document. Overdue items are marked ⚠.
 
-Last updated: 25 Nov 2026, evening (Mert).
+Last updated: 25 Nov 2026, evening (Görkem: H12 done, H31 added).
 
 ## Open
 
@@ -33,7 +33,7 @@ Last updated: 25 Nov 2026, evening (Mert).
 | H09 | Erol | Zeynep | R9: are the no-shows that already caused a penalty counted again for the next penalty? Is the 30-day window based on the reservation start time (current assumption API-A7)? | 25 Nov | Open | 5.4 F6; 5.8.4.9 |
 | H10 | Mert | Zeynep, Erol | Confirm or change the PM defaults D1–D4. The API contract already follows them. | 25 Nov | Open | 5.4.2a |
 | H11 | Enes | Arzum | Screen designs and user flow. | 23 Nov | In progress | `docs/diagrams/5.7_ui-*_Arzum.png` |
-| H12 | Görkem, Mert | Görkem | Use case diagram and the 10 use case descriptions. | 23 Nov | Open | — |
+| H31 | Görkem | Zeynep (Mert as draft author) | 5.4 FR tables: take the UC column from the FR → UC table in 5.6.3. Three FRs had no UC or only a feature there: FR-31 → UC-07, FR-54 → UC-08, FR-55 → UC-09. | 1 Dec | Open | `docs/report/5.6_use-cases_Gorkem.md` 5.6.3 |
 | H13 | Mert | Everyone | Full name, student ID and course section for the 5.13 matrix. | 23 Nov | Open | `docs/report/5.13-5.14_report-text_Mert.md` |
 | H14 | Mert | Everyone | Your AI usage row for 5.14 (section, tool, purpose, reviewer). | when your part is done | Open | `docs/report/5.13-5.14_report-text_Mert.md` |
 
@@ -51,3 +51,4 @@ Last updated: 25 Nov 2026, evening (Mert).
 | H17 | Mert | Batuhan | Name, student ID and section in 5.13; AI usage row for 5.8 (API part). | 23 Nov | `docs/report/5.13-5.14_report-text_Mert.md` |
 | H18 | Batuhan, Enes | Erol | Prisma schema, initial migration and seed data. | 23 Nov | PR #4 |
 | H28 | Batuhan | Mert | KVKK Art. 9 (transfer abroad) added to 5.10.2: the three mechanisms in order (adequacy decision / appropriate safeguards / occasional transfer) from the implementing regulation of 10 July 2024, the standard-contract route and its five-business-day notification duty, why the occasional-transfer route does not cover ordinary hosting, and the recommendation to host in Turkey. The pilot decision from 5.8.5.5 (seed users only) is carried over. The questions that need the university are now H29; the two unverified sources are H30. | 25 Nov | 5.10.2 "Transfer of personal data abroad (Art. 9)" |
+| H12 | Görkem, Mert | Görkem | 5.6 Use case diagram (4 actors + Campus User, UC-01 to UC-10, one `<<include>>`, one `<<extend>>`), 10 fully-dressed use case descriptions with alternative flows, error codes and API endpoints, and the FR → UC traceability table (all 55 FRs). PNG rendered on 25 Nov with PlantUML 1.2026.10. | 25 Nov | `docs/report/5.6_use-cases_Gorkem.md`, `docs/diagrams/5.6_use-case-diagram_Gorkem.puml/.png` |

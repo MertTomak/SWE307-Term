@@ -1,0 +1,74 @@
+@startuml 5.6_use-case-diagram_Gorkem
+' 5.6 UML Use Case diagram - CampusSlot
+' Owner: Görkem (QA/Test Engineer). Text: docs/report/5.6_use-cases_Gorkem.md
+' Render: java -jar plantuml.jar -Playout=smetana -tpng <this file>
+' Names (actors, UC-01..UC-10) are the ones in the project card. Do not rename.
+title CampusSlot - UML Use Case Diagram
+skinparam shadowing false
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+}
+left to right direction
+
+actor "Campus User" as CU <<abstract>>
+actor "Student" as ST
+actor "Academic Staff" as AS
+actor "Resource Admin" as RA
+actor "System Scheduler" as SS <<time>>
+
+' Student and Academic Staff derive from the abstract Campus User (project card).
+ST --|> CU
+AS --|> CU
+
+rectangle "CampusSlot" {
+  usecase "UC-01\nRegister and Log In" as UC01
+  usecase "UC-02\nSearch Resources and\nView Availability" as UC02
+  usecase "UC-03\nMake Reservation" as UC03
+  usecase "UC-04\nCancel Reservation" as UC04
+  usecase "UC-05\nCheck In with QR" as UC05
+  usecase "UC-10\nView My Reservations\n--\nextension points:\nreservation selected" as UC10
+  usecase "UC-06\nApprove or Reject\nEquipment Reservation" as UC06
+  usecase "UC-07\nManage Resources" as UC07
+  usecase "UC-08\nView Usage Reports" as UC08
+  usecase "UC-09\nProcess No-Shows and\nApply Penalties" as UC09
+}
+
+' Campus User (Student, Academic Staff)
+CU --> UC01
+CU --> UC02
+CU --> UC03
+CU --> UC05
+CU --> UC10
+
+' Resource Admin logs in, searches and manages; does not reserve or check in (D3).
+RA --> UC01
+RA --> UC02
+RA --> UC06
+RA --> UC07
+RA --> UC08
+
+' System Scheduler (time-triggered, every 60 s)
+SS --> UC09
+
+' Choosing a resource and a free slot is always part of making a reservation.
+UC03 .[norank].> UC02 : <<include>>
+
+' Cancelling is optional behaviour started from the reservation list.
+UC04 .[norank].> UC10 : <<extend>>\n[status PENDING_APPROVAL or CONFIRMED\nand now < startTime]
+
+note as N1
+  UC-09: no user starts it. The System Scheduler
+  runs jobs J1-J3 every 60 seconds (5.8.4.9):
+  no-show (R8), penalty (R9), auto-complete,
+  auto-reject of undecided equipment (D4).
+end note
+
+legend bottom left
+  Precondition of every use case except UC-01 and UC-09:
+  the actor is logged in (valid JWT). Written as a precondition,
+  not drawn as <<include>> (5.6.1, UC-A1).
+endlegend
+@enduml
