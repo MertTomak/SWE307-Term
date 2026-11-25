@@ -1,0 +1,19 @@
+---
+title: Cumulative discounted cash flow, base case (Scenario B, 36%, 3 years)
+---
+xychart-beta
+    title "CampusSlot cumulative discounted cash flow (TL)"
+    x-axis "Year" [0, 1, 2, 3]
+    y-axis "Cumulative discounted cash flow (TL)" -80000 --> 30000
+    bar [-71313, -31325, -1923, 19697]
+    line [-71313, -31325, -1923, 19697]
+
+%% Data source: docs/report/5.11_operating-costs_Mert.md, section 5.11.8.
+%% t=0  -71,313.27  development cost (opportunity cost, 399 h x 178.73 TL/h)
+%% t=1  -31,325.48  after +39,987.79 discounted net benefit
+%% t=2   -1,922.69  after +29,402.79 discounted net benefit
+%% t=3  +19,697.01  after +21,619.70 discounted net benefit  = NPV
+%%
+%% The curve crosses zero during year 3: discounted payback = 2.09 years (5.11.10).
+%% Simple (undiscounted) payback = 1.31 years.
+%% Regenerate the figures with docs/report/5.11_cost-benefit-model_Mert.py.
