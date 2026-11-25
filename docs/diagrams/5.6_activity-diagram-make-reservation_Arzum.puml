@@ -1,0 +1,97 @@
+@startuml 5.6_activity-diagram-make-reservation_Arzum
+' 5.6 UML Activity diagram (swimlanes) - Make Reservation (F3, UC-03) - CampusSlot
+' Owner: Arzum (UX/UI Designer). Sources: project card (R1-R5), 5.4 (FR-13 to FR-22, FR-44 to FR-48, FR-55, D1-D4),
+'          5.8.4.7 rule chain (order R1, R4, R2, R3, R5), 5.7 state machine (T1 to T5).
+' Status names = enum ReservationStatus in backend/prisma/schema.prisma.
+' Render: java -jar plantuml.jar -Playout=smetana -tpng <this file>
+title CampusSlot - UML Activity Diagram: Make Reservation (R1-R5)
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ActivityBackgroundColor #FFFFFF
+skinparam ActivityBorderColor #1F5FBF
+skinparam ArrowColor #1F5FBF
+
+|Campus User|
+start
+:Choose a resource, a start time\nand an end time;
+:Submit the reservation (E07);
+
+|System|
+:Check the input and the resource\n(end after start, start not in the past,\nresource exists and is active);
+if (Input and resource valid?) then (no)
+  :Refuse the request and\nname the problem (FR-20, FR-21);
+  |Campus User|
+  :Read the message;
+  stop
+else (yes)
+endif
+
+|System|
+if (R1: duration at most 3 hours?) then (no)
+  :Refuse: RULE_R1_MAX_DURATION;
+  |Campus User|
+  :Read the message;
+  stop
+else (yes)
+endif
+
+|System|
+if (R4: user has no running penalty?) then (no)
+  :Refuse: RULE_R4_ACTIVE_PENALTY\n(show when the penalty ends, FR-17);
+  |Campus User|
+  :Read the message;
+  stop
+else (yes)
+endif
+
+|System|
+if (R2: active reservations below the limit?\n(Student 2, Academic Staff 5)) then (no)
+  :Refuse: RULE_R2_ACTIVE_LIMIT;
+  |Campus User|
+  :Read the message;
+  stop
+else (yes)
+endif
+
+|System|
+if (R3: no overlap on this resource?) then (no)
+  :Refuse: RULE_R3_OVERLAP;
+  |Campus User|
+  :Read the message and\nchoose another slot;
+  stop
+else (yes)
+endif
+
+|System|
+if (R5: resource type is EQUIPMENT?) then (yes)
+  :Save the reservation as PENDING_APPROVAL;
+  :Notify the user (RESERVATION_PENDING);
+  |Resource Admin|
+  :Open the list of pending\nequipment reservations (E14);
+  note right
+    If nobody decides before the start time,
+    the System Scheduler sets REJECTED
+    with a system reason (D4, FR-55).
+  end note
+  if (Approve?) then (yes)
+    :Approve (E15);
+    |System|
+    :Set CONFIRMED;
+    :Notify the user (RESERVATION_APPROVED);
+  else (no)
+    |Resource Admin|
+    :Reject and give a reason (E16);
+    |System|
+    :Set REJECTED and free the slot;
+    :Notify the user (RESERVATION_REJECTED);
+  endif
+else (no, ROOM or LAB)
+  :Save the reservation as CONFIRMED;
+  :Notify the user (RESERVATION_CONFIRMED);
+endif
+
+|Campus User|
+:See the reservation and its status\nin "My reservations";
+stop
+
+@enduml

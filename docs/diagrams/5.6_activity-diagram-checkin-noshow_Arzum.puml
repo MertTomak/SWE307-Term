@@ -1,0 +1,61 @@
+@startuml 5.6_activity-diagram-checkin-noshow_Arzum
+' 5.6 UML Activity diagram (swimlanes) - QR Check-in and No-Show (F5, F6, UC-05, UC-09) - CampusSlot
+' Owner: Arzum (UX/UI Designer). Sources: project card (R7, R8, R9), 5.4 (FR-31 to FR-43),
+'          5.8.4.8 check-in logic, 5.8.4.9 scheduler jobs J1 and J2, 5.7 state machine (T8 to T10).
+' Render: java -jar plantuml.jar -Playout=smetana -tpng <this file>
+title CampusSlot - UML Activity Diagram: QR Check-in and No-Show (R7-R9)
+skinparam shadowing false
+skinparam defaultFontSize 12
+skinparam ActivityBackgroundColor #FFFFFF
+skinparam ActivityBorderColor #1F5FBF
+skinparam ArrowColor #1F5FBF
+
+|Campus User|
+start
+:Go to the resource with a\nCONFIRMED reservation;
+:Scan the QR code, or type the\n6-digit code if the camera does not open (E11);
+
+|System|
+:Find the resource by its QR token\nor its 6-digit code;
+if (Resource found?) then (yes)
+  if (R7: the user has a CONFIRMED reservation on it and\nstart - 10 min <= now <= start + 15 min?) then (yes)
+    :Create the check-in (time and method)\nand set CHECKED_IN;
+    |Campus User|
+    :See "Checked in" and use the resource;
+    |System Scheduler|
+    :J2: when the end time has passed,\nset COMPLETED;
+    stop
+  else (no)
+    |System|
+    :Refuse and say why (FR-37):\ntoo early, too late, already checked in,\nnot confirmed, or no reservation here;
+    |Campus User|
+    :Read the reason;
+  endif
+else (no)
+  |System|
+  :Refuse: check-in code not valid;
+  |Campus User|
+  :Read the reason;
+endif
+
+|System Scheduler|
+if (R8: CONFIRMED and no check-in\n15 minutes after the start?) then (yes)
+  :Set NO_SHOW and free the resource;
+  note right
+    The scheduler runs every 60 seconds (J1).
+    It looks at every CONFIRMED reservation that
+    has no check-in, whatever the user did before.
+  end note
+  :Notify the user (NO_SHOW_RECORDED);
+  if (R9: 3 or more NO_SHOW in the last 30 days\nand no running penalty?) then (yes)
+    :Create a 7-day Penalty;
+    :Notify the user (PENALTY_APPLIED);
+    |Campus User|
+    :Cannot reserve until the penalty ends (R4);
+  else (no)
+  endif
+else (no)
+endif
+stop
+
+@enduml
