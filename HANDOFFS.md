@@ -10,7 +10,7 @@ One list of open hand-offs between team members, so nobody has to read the commi
 - Status values: `Open` · `In progress` · `Blocked` (say why in **What**).
 - Dates are from the plan in `docs/report/5.5_planning_Mert.md` and the task document. Overdue items are marked ⚠.
 
-Last updated: 25 Nov 2026, evening (Batuhan: H07 done; H38, H39 added; H37 proposal. Before: Görkem H12, H32, H34 done; H31, H33, H35–H37 open).
+Last updated: 25 Nov 2026, evening (Batuhan: H07 done; H06 draft; H38–H41 added; H37 proposal. Before: Görkem H12, H32, H34 done; H31, H33, H35–H37 open).
 
 ## Open
 
@@ -20,7 +20,9 @@ Last updated: 25 Nov 2026, evening (Batuhan: H07 done; H38, H39 added; H37 propo
 | H03 | Batuhan | Erol | Read the API contract and tell Batuhan which endpoints are hard to build by 1 Dec, so the contract can be changed early. | 24 Nov | Open | `docs/report/5.8_api-design_Batuhan.md` |
 | H19 | Enes, Batuhan | Erol | Confirm the backend port (the frontend assumes `3000`, see `frontend/.env.example`) and add the server start command to the README. | when the Express server is added | Open | `README.md` |
 | H20 | Görkem, Mert | Enes | Build the screens on the frontend skeleton, starting with Log in and Register. Each page file already lists its use case and API calls. The Register page needs the privacy notice and the `privacyNoticeAccepted` checkbox (5.8.5.5), and must not use `dangerouslySetInnerHTML` (5.8.5.2, A05). | 1 Dec (plan L, M, N) | Open | `frontend/src/pages/`, `frontend/README.md` |
-| H06 | Mert | Batuhan | 5.7 design patterns (checked against Erol's code). Component and Deployment diagrams (H21) and 5.8.5 security (H25) are done. | 27 Nov | Open | — |
+| H06 | Mert | Batuhan | 5.7 design patterns: **draft done 25 Nov** (P1 Strategy, P2 State, P3 Repository, P4 Chain of Responsibility, P5 Singleton, P6 DTO + Mapper, with diagram). Only P5 is verified in code; the rest are checked against Erol's code when it is on `main` (DP-1). | 27 Nov | In progress | `docs/report/5.7_design-patterns_Batuhan.md` |
+| H40 | Batuhan | Erol | Use the class names of 5.7 design patterns in the code and in the class diagram (`ReservationRule`, `DurationRule`, `PenaltyRule`, `ActiveLimitRule`, `OverlapRule`, `RuleContext`, `ReservationStateMachine.next()`, one repository per table), or tell Batuhan which names you prefer (DP-2). | 28 Nov | Open | `docs/report/5.7_design-patterns_Batuhan.md` |
+| H41 | Batuhan | Enes | Your open point "approve or reject after the start time" in 5.7 state machine is already decided: E15 and E16 answer `422 RESERVATION_ALREADY_STARTED` when the start time has passed (5.8.4.3 catalogue). You can replace the [TBD] with this reference (DP-3). | 28 Nov | Open | `docs/report/5.7_state-machine_Enes.md` |
 | H26 | Batuhan | Erol | Build the server controls in 5.8.5.2: role and ownership checks, `helmet`, `cors` with `CORS_ORIGIN`, rate limits, door codes from `crypto` (not `Math.random`), logging without passwords, tokens or codes. Contract change: password max 72 bytes in E01 (bcrypt limit). | 1 Dec | Open | 5.8.5.2, 5.8.5.3 |
 | H27 | Batuhan | Görkem | Security tests ST-01 to ST-15 for 5.12. Seed the demo database with a secret `SEED_PASSWORD`: the default `CampusSlot123!` in `seed.ts` is public on GitHub. Run `npm audit` before the freeze. | 1 Dec | Open | 5.8.5.6, SEC-O4 |
 | H29 | Batuhan, Enes | Mert | Follow-up to H28, the parts that need an answer from outside the team: SEC-O1 the server region of Render and Neon and whether real use needs hosting in Turkey; SEC-O2 who receives and answers Art. 11 requests within 30 days; SEC-O3 the exact privacy notice wording for the register page (Enes is blocked on the wording, not on the checkbox); and which Art. 5 legal basis the university relies on. | 1 Dec | Open | 5.10.2 "Questions for the university" |

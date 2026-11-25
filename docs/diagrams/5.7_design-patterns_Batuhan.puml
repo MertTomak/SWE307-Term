@@ -1,0 +1,65 @@
+@startuml 5.7_design-patterns_Batuhan
+' 5.7 Design patterns P1 Strategy, P2 State (table-driven), P3 Repository - CampusSlot (planned classes)
+' Owner: Batuhan (System Architect). Text: docs/report/5.7_design-patterns_Batuhan.md
+' Render: java -jar plantuml.jar -Playout=smetana -tpng <this file>
+title CampusSlot - Design Patterns (Strategy, State, Repository)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide empty members
+
+package "Application layer" {
+  class ReservationService {
+    - rules : ReservationRule[]
+    + create(user, input, now) : Reservation
+    + cancel(user, id, now) : Reservation
+  }
+}
+
+package "Domain layer (no Express, no Prisma)" {
+  interface ReservationRule <<Strategy>> {
+    + id : string
+    + check(ctx : RuleContext) : RuleViolation | null
+  }
+  class DurationRule <<R1>>
+  class PenaltyRule <<R4>>
+  class ActiveLimitRule <<R2>>
+  class OverlapRule <<R3>>
+  class RuleContext {
+    role, start, end, now
+    activeReservationCount
+    runningPenaltyEndsAt
+    overlappingCount
+  }
+  class ReservationStateMachine <<State>> {
+    - TRANSITIONS : table T1-T10
+    + next(from : Status, event : Event) : Status
+  }
+}
+
+package "Data layer" {
+  interface ReservationRepository <<Repository>> {
+    + countActiveByUser(userId, now) : number
+    + findOverlapping(resourceId, start, end, tx) : number
+    + save(reservation, tx) : Reservation
+  }
+  class PrismaReservationRepository
+  class "prisma (db/prisma.ts)" as PrismaSingleton <<Singleton>>
+}
+
+ReservationService o--> "4, fixed order" ReservationRule : runs R1, R4, R2, R3
+ReservationRule <|.. DurationRule
+ReservationRule <|.. PenaltyRule
+ReservationRule <|.. ActiveLimitRule
+ReservationRule <|.. OverlapRule
+ReservationRule ..> RuleContext : reads
+ReservationService ..> ReservationStateMachine : next(status, event)
+ReservationService --> ReservationRepository : loads data, saves
+ReservationRepository <|.. PrismaReservationRepository
+PrismaReservationRepository ..> PrismaSingleton : uses
+
+legend bottom
+  Strategy: each rule is one class with the same interface; order from 5.8.4.7.
+  State: one transition table (T1-T10 of the 5.7 state machine diagram); invalid -> 409 INVALID_STATE_TRANSITION.
+  Repository: only the Data layer imports Prisma. Singleton: one PrismaClient per process (verified in code).
+endlegend
+@enduml

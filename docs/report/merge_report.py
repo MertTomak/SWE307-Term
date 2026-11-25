@@ -52,10 +52,11 @@ MANIFEST = [
      "User stories + DFDs (Zeynep) and "
      "activity diagram text (Arzum) still missing."),
     ("5.7", "Software Design",
-     ["5.7_component-deployment_Batuhan.md", "5.7_state-machine_Enes.md"],
+     ["5.7_component-deployment_Batuhan.md", "5.7_state-machine_Enes.md",
+      "5.7_design-patterns_Batuhan.md"],
      "Batuhan / Enes / Erol",
-     "Partial: component, deployment and state machine done. "
-     "Class diagram, sequence diagram and design patterns still missing."),
+     "Partial: component, deployment, state machine and design patterns (draft) done. "
+     "Class diagram and sequence diagram still missing."),
     ("5.8", "Technical Architecture",
      ["5.8_architecture-stack_Batuhan.md", "5.8_api-design_Batuhan.md",
       "5.8.5_security-privacy_Batuhan.md"], "Batuhan", None),
