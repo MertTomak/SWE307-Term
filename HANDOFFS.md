@@ -10,7 +10,7 @@ One list of open hand-offs between team members, so nobody has to read the commi
 - Status values: `Open` · `In progress` · `Blocked` (say why in **What**).
 - Dates are from the plan in `docs/report/5.5_planning_Mert.md` and the task document. Overdue items are marked ⚠.
 
-Last updated: 25 Nov 2026, evening (Görkem: H12, H32, H34 done; H31, H33, H35 open).
+Last updated: 25 Nov 2026, evening (Görkem: H12, H32, H34 done; H31, H33, H35–H37 open).
 
 ## Open
 
@@ -36,6 +36,8 @@ Last updated: 25 Nov 2026, evening (Görkem: H12, H32, H34 done; H31, H33, H35 o
 | H31 | Görkem | Zeynep (Mert as draft author) | 5.4 FR tables: take the UC column from the FR → UC table in 5.6.3. Three FRs had no UC or only a feature there: FR-31 → UC-07, FR-54 → UC-08, FR-55 → UC-09. | 1 Dec | Open | `docs/report/5.6_use-cases_Gorkem.md` 5.6.3 |
 | H33 | Görkem | Erol | The automated tests are in `backend/tests` (54 tests, `npm test`). They are skipped until your code exists and need three things from it, listed in `backend/tests/README.md`: (1) `src/app.ts` exports the Express app (`app`, default or `createApp()`) without `listen()`; (2) `src/jobs/index.ts` exports `runSchedulerOnce(now?: Date)` running J3, J1, J2, J4; (3) R6–R9, the token lifetime and the jobs take the time from JavaScript (`new Date()`) or a `now` parameter, never from SQL `now()`, so the tests can set the clock. Run them with a test database in `DATABASE_URL_TEST` (name must contain "test"). | 27 Nov | Open | `backend/tests/README.md` |
 | H35 | Görkem | Mert | GitHub Actions seems to be off for this repository (no workflow and no run is listed, also after a push of `.github/workflows/backend-tests.yml`). Please check Settings → Actions → General and allow actions, so the backend tests run on every push with PostgreSQL 16. | 28 Nov | Open | `.github/workflows/backend-tests.yml` |
+| H36 | Görkem | Mert | Three points from a review of Görkem's work that belong to your files: (1) `merge_report.py --pdf` looks for Chrome only on macOS/Linux paths, so it fails on Windows (Chrome is at `C:\Program Files\Google\Chrome\Application\chrome.exe`); (2) only 5.6 embeds its diagram as an image (`![...](../diagrams/....png)`, checked in Chrome); the other report files only name their PNGs, so their diagrams are not in the PDF yet; (3) the note in 5.14 says "Claude Opus 5.5" does not exist, but Görkem's session ran on Claude Opus 5.5 (shown in the Claude app's model picker); please check each model name in the app instead of correcting it from memory. | 4 Dec | Open | `docs/report/merge_report.py`, 5.14 |
+| H37 | Görkem | Batuhan, Erol | `prisma` 7.10.1 pulls in `@prisma/streams-local` (through `@prisma/dev`), which declares Node.js >= 22. The README says Node.js 20.19 or newer. Please check whether Node 20 still works for the backend, or change the README to Node 22. (The test tools now support Node 20.) | 1 Dec | Open | `README.md` Requirements |
 | H13 | Mert | Everyone | Full name, student ID and course section for the 5.13 matrix. | 23 Nov | Open | `docs/report/5.13-5.14_report-text_Mert.md` |
 | H14 | Mert | Everyone | Your AI usage row for 5.14 (section, tool, purpose, reviewer). | when your part is done | Open | `docs/report/5.13-5.14_report-text_Mert.md` |
 
