@@ -61,14 +61,28 @@ describe.skipIf(!runSchedulerOnce)("UC-09 System Scheduler (DT-2)", () => {
     expect(await prisma.penalty.count({ where: { userId: user.id } })).toBe(0); // first no-show: no penalty
   });
 
-  it.skipIf(!app)("TC-35 (API part) the slot of a NO_SHOW is free again", async () => {
+  it.skipIf(!app)("TC-35 (API part) after a NO_SHOW the calendar shows the slot as free and it can be booked", async () => {
     if (!app) return; // narrows the type; the test is skipped without src/app.ts
     const owner = await createUser("STUDENT");
     const other = await createUser("STUDENT");
     const room = await createResource("ROOM");
     await createReservation({ userId: owner.id, resourceId: room.id, start: START, end: plus(START, HOUR), status: "CONFIRMED" });
-    await runAt(plus(START, 16 * MINUTE));
+    const token = await login(app, other.email);
+    const calendar = () =>
+      request(app!).get(`${API}/resources/${room.id}/availability`).query({ date: "2026-12-07" }).set(bearer(token));
 
+    // Before the no-show the 10:00-11:00 slot is booked (FR-12) ...
+    const before = await calendar();
+    expect(before.status).toBe(200);
+    expect(before.body.bookedSlots.map((s: { status: string }) => s.status)).toEqual(["CONFIRMED"]);
+
+    // ... after the scheduler marks it NO_SHOW, the calendar shows it as free (FR-40, plan step 3).
+    await runAt(plus(START, 16 * MINUTE));
+    const after = await calendar();
+    expect(after.status).toBe(200);
+    expect(after.body.bookedSlots).toEqual([]);
+
+    // The free time can really be booked (R3 ignores NO_SHOW).
     const res = await request(app)
       .post(`${API}/reservations`)
       .set(bearer(await login(app, other.email)))

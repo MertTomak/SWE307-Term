@@ -30,7 +30,9 @@ jobs:
           --health-retries 10
     env:
       # Throwaway database inside the CI container; these are not real credentials.
-      DATABASE_URL: postgresql://campusslot:campusslot@localhost:5432/campusslot_test?schema=public
+      # DATABASE_URL is only read by `prisma generate` (no connection). It must not be
+      # the test database: the tests refuse to run when both point to the same one.
+      DATABASE_URL: postgresql://campusslot:campusslot@localhost:5432/campusslot_dev?schema=public
       DATABASE_URL_TEST: postgresql://campusslot:campusslot@localhost:5432/campusslot_test?schema=public
       JWT_SECRET: ci-only-jwt-secret-0123456789abcdef0123456789abcdef
     steps:

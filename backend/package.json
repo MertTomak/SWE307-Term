@@ -17,6 +17,7 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset",
     "test": "vitest run",
+    "test:full": "vitest run --config vitest.full.config.ts",
     "test:watch": "vitest"
   },
   "dependencies": {
@@ -33,6 +34,6 @@
     "supertest": "7.3.2",
     "tsx": "4.23.15",
     "typescript": "7.0.2",
-    "vitest": "5.1.0"
+    "vitest": "4.1.12"
   }
 }

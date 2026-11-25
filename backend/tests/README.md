@@ -12,7 +12,8 @@ Owner: Görkem (QA/Test Engineer). Stack: Vitest + Supertest.
 cd backend
 npm install
 npx prisma generate
-npm test
+npm test            # skips what does not exist yet
+npm run test:full   # strict: nothing may be skipped
 ```
 
 The API, scheduler and database tests need a **separate test database**. Put it
@@ -22,10 +23,19 @@ in `backend/.env` (see `.env.example`):
 DATABASE_URL_TEST="postgresql://USER:PASSWORD@localhost:5432/campusslot_test?schema=public"
 ```
 
-- The name of the database must contain `test`. Every test file deletes all rows
-  in it, so it must never be the development database.
-- The migrations are applied to it automatically at the start of `npm test`.
-- Without `DATABASE_URL_TEST` the database tests are **skipped**, not failed.
+- Every test deletes all rows in it, so the tests refuse to start when
+  - the database name does not contain `test`, or
+  - it is the same database (host, port, name) as `DATABASE_URL`, or
+  - the live connection reaches a database whose name does not contain `test`.
+- The migrations are applied to it automatically at the start of the run.
+- Node.js 20.19 or newer, as for the rest of the backend (Vitest 4.1 supports it).
+
+### Two ways to run
+
+| Command | When | Missing test database or backend code |
+|---|---|---|
+| `npm test` | While the backend is being built, on every push (CI). | The tests that need it are **skipped**; the run passes. The first test prints what was missing. |
+| `npm run test:full` | The real test run for the report (1–3 Dec) and CI after the code freeze. | The run **fails**. Use this result in 5.12, so that "passed" never means "skipped". |
 
 GitHub Actions (`.github/workflows/backend-tests.yml`) runs the same command
 with PostgreSQL 16 on every pull request that touches `backend/`.

@@ -14,7 +14,17 @@ const testPasswordHash = bcrypt.hashSync(TEST_PASSWORD, 4); // low cost: test sp
 let counter = 0;
 const next = () => ++counter;
 
+let connectedToTestDb = false;
+
 export async function resetDb(): Promise<void> {
+  // Last check before deleting: the live connection must reach a test database.
+  if (!connectedToTestDb) {
+    const [{ name }] = await prisma.$queryRaw<{ name: string }[]>`SELECT current_database() AS name`;
+    if (!/test/i.test(name)) {
+      throw new Error(`Refusing to empty the database "${name}": its name does not contain "test".`);
+    }
+    connectedToTestDb = true;
+  }
   await prisma.$executeRawUnsafe(
     'TRUNCATE TABLE "Notification", "CheckIn", "Penalty", "Reservation", "Resource", "User" CASCADE',
   );

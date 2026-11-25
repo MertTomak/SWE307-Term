@@ -9,6 +9,7 @@
 import { existsSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import type request from "supertest";
+import { fullRun } from "../setup/test-db-url.js";
 
 /** Anything supertest can call: the Express app. */
 export type App = Parameters<typeof request>[0];
@@ -23,7 +24,10 @@ export type RunSchedulerOnce = (now?: Date) => Promise<unknown>;
 
 /** The Express app, or null when the database or src/app.ts is missing. */
 export async function loadApp(): Promise<App | null> {
-  if (!hasDb || !existsSync(appFile)) return null;
+  if (!hasDb || !existsSync(appFile)) {
+    if (fullRun) throw new Error("npm run test:full: src/app.ts (or the test database) is missing.");
+    return null;
+  }
   const mod: Record<string, unknown> = await import(/* @vite-ignore */ pathToFileURL(appFile).href);
   const candidate = mod.app ?? mod.default ?? mod.createApp;
   if (isExpressApp(candidate)) return candidate;
@@ -36,7 +40,10 @@ export async function loadApp(): Promise<App | null> {
 
 /** One scheduler run, or null when the database or src/jobs/index.ts is missing. */
 export async function loadScheduler(): Promise<RunSchedulerOnce | null> {
-  if (!hasDb || !existsSync(jobsFile)) return null;
+  if (!hasDb || !existsSync(jobsFile)) {
+    if (fullRun) throw new Error("npm run test:full: src/jobs/index.ts (or the test database) is missing.");
+    return null;
+  }
   const mod: Record<string, unknown> = await import(/* @vite-ignore */ pathToFileURL(jobsFile).href);
   if (typeof mod.runSchedulerOnce !== "function") {
     throw new Error("src/jobs/index.ts must export runSchedulerOnce(now?: Date).");
@@ -48,4 +55,4 @@ function isExpressApp(value: unknown): value is App {
   return typeof value === "function" && typeof (value as { use?: unknown }).use === "function";
 }
 
-export const status = { hasDb, hasAppFile: existsSync(appFile), hasJobsFile: existsSync(jobsFile) };
+export const status = { fullRun, hasDb, hasAppFile: existsSync(appFile), hasJobsFile: existsSync(jobsFile) };
