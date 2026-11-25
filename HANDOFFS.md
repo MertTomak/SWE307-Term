@@ -10,7 +10,7 @@ One list of open hand-offs between team members, so nobody has to read the commi
 - Status values: `Open` · `In progress` · `Blocked` (say why in **What**).
 - Dates are from the plan in `docs/report/5.5_planning_Mert.md` and the task document. Overdue items are marked ⚠.
 
-Last updated: 25 Nov 2026, evening (Görkem: H12 done, H31 added).
+Last updated: 25 Nov 2026, evening (Görkem: H12 and H32 done, H31 added).
 
 ## Open
 
@@ -52,3 +52,4 @@ Last updated: 25 Nov 2026, evening (Görkem: H12 done, H31 added).
 | H18 | Batuhan, Enes | Erol | Prisma schema, initial migration and seed data. | 23 Nov | PR #4 |
 | H28 | Batuhan | Mert | KVKK Art. 9 (transfer abroad) added to 5.10.2: the three mechanisms in order (adequacy decision / appropriate safeguards / occasional transfer) from the implementing regulation of 10 July 2024, the standard-contract route and its five-business-day notification duty, why the occasional-transfer route does not cover ordinary hosting, and the recommendation to host in Turkey. The pilot decision from 5.8.5.5 (seed users only) is carried over. The questions that need the university are now H29; the two unverified sources are H30. | 25 Nov | 5.10.2 "Transfer of personal data abroad (Art. 9)" |
 | H12 | Görkem, Mert | Görkem | 5.6 Use case diagram (4 actors + Campus User, UC-01 to UC-10, one `<<include>>`, one `<<extend>>`), 10 fully-dressed use case descriptions with alternative flows, error codes and API endpoints, and the FR → UC traceability table (all 55 FRs). PNG rendered on 25 Nov with PlantUML 1.2026.10. | 25 Nov | `docs/report/5.6_use-cases_Gorkem.md`, `docs/diagrams/5.6_use-case-diagram_Gorkem.puml/.png` |
+| H32 | Erol, Batuhan | Görkem | 5.6 Decision tables: DT-1 reservation request (R1–R5, 32 → 6 rules) and DT-2 check-in, no-show and penalty (R7–R9, 32 → 7 rules), step-by-step reduction, boundary values for the tests, and a script that checks the reduced tables. Erol: DT-1 follows the rule order R1, R4, R2, R3 of 5.8.4.7 and DT-2 the check-in window and J1; if the code uses another order, tell Görkem. | 25 Nov | `docs/report/5.6_decision-tables_Gorkem.md`, `docs/report/5.6_decision-tables_Gorkem.py` |
