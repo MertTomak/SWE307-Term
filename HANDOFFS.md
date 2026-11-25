@@ -10,7 +10,7 @@ One list of open hand-offs between team members, so nobody has to read the commi
 - Status values: `Open` · `In progress` · `Blocked` (say why in **What**).
 - Dates are from the plan in `docs/report/5.5_planning_Mert.md` and the task document. Overdue items are marked ⚠.
 
-Last updated: 25 Nov 2026 (Mert).
+Last updated: 25 Nov 2026, evening (Mert).
 
 ## Open
 
@@ -24,7 +24,7 @@ Last updated: 25 Nov 2026 (Mert).
 | H26 | Batuhan | Erol | Build the server controls in 5.8.5.2: role and ownership checks, `helmet`, `cors` with `CORS_ORIGIN`, rate limits, door codes from `crypto` (not `Math.random`), logging without passwords, tokens or codes. Contract change: password max 72 bytes in E01 (bcrypt limit). | 1 Dec | Open | 5.8.5.2, 5.8.5.3 |
 | H27 | Batuhan | Görkem | Security tests ST-01 to ST-15 for 5.12. Seed the demo database with a secret `SEED_PASSWORD`: the default `CampusSlot123!` in `seed.ts` is public on GitHub. Run `npm audit` before the freeze. | 1 Dec | Open | 5.8.5.6, SEC-O4 |
 | H29 | Batuhan, Enes | Mert | Follow-up to H28, the parts that need an answer from outside the team: SEC-O1 the server region of Render and Neon and whether real use needs hosting in Turkey; SEC-O2 who receives and answers Art. 11 requests within 30 days; SEC-O3 the exact privacy notice wording for the register page (Enes is blocked on the wording, not on the checkbox); and which Art. 5 legal basis the university relies on. | 1 Dec | Open | 5.10.2 "Questions for the university" |
-| H30 | — | Mert | Close the two unverified sources in 5.10.2 flagged `[TBD]`: (a) read the paragraph text of KVKK Art. 9 in a readable copy — the official PDF uses a font encoding that drops Turkish characters and could not be quoted; (b) confirm on kvkk.gov.tr whether the Board has issued any adequacy decision — the site failed TLS certificate verification on 25 Nov. An unverifiable reference counts as insufficient content under the grading rules. | 4 Dec (before the PDF) | Open | 5.10.2 |
+| H30 | — | Mert | (a) **Done 25 Nov:** Art. 9 paragraph text extracted and quoted in 5.10.2 using `pdftotext -layout` (poppler) on the official PDF — the earlier naive extraction had dropped Turkish characters. (b) **Still open:** confirm on kvkk.gov.tr/Icerik/2053/Yurtdisina-Aktarim whether the Board has issued any adequacy decision. Two searches agree "not yet", but the site's broken TLS chain blocked a direct fetch; open it in an ordinary browser and quote the sentence, or update 5.10.2 if the page has changed. One-minute task. | 4 Dec (before the PDF) | Open (part a done) | 5.10.2 |
 | H22 | Erol | Batuhan → Erol | Proposed backend folder structure and layer rule (Domain layer without Express or Prisma). Erol: say if you want other names; the 5.7 class diagram must follow the final code. | 25 Nov | Open | 5.8.1 in `docs/report/5.8_architecture-stack_Batuhan.md` |
 | H23 | Enes | Enes | Choose the QR scanning library and test it on the team's phones. `html5-qrcode` (suggested in the task document) was last published in April 2023; `@zxing/browser` is a maintained alternative. | 26 Nov | Open | 5.8.2 |
 | H24 | Mert, Görkem | Team | Demo hosting: free Render instance kept awake before the demo, or the paid instance (5.11 Scenario B) for the presentation week. The free instance sleeps, and the scheduler sleeps with it. | 1 Dec | Open | 5.7 Deployment, risks |
