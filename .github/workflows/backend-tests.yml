@@ -1,12 +1,11 @@
-# Runs the backend tests (5.12) against a real PostgreSQL on every pull request
-# and on every push to main that touches the backend.
+# Runs the backend tests (5.12) against a real PostgreSQL on every push to any
+# branch and on every pull request that touches the backend.
 name: Backend tests
 
 on:
   pull_request:
     paths: ["backend/**", ".github/workflows/backend-tests.yml"]
   push:
-    branches: [main]
     paths: ["backend/**", ".github/workflows/backend-tests.yml"]
 
 jobs:
