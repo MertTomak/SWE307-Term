@@ -15,7 +15,7 @@ The API contract between frontend and backend is `docs/report/5.8_api-design_Bat
 
 ## Requirements
 
-- Node.js 20.19 or newer (`node --version`)
+- Node.js 22 or newer (`node --version`). The backend needs it: Prisma 7.10.1 pulls in a package that declares Node.js >= 22 (H37). The frontend alone also runs on 20.19.
 - PostgreSQL 14 or newer for the backend
 
 ## Frontend

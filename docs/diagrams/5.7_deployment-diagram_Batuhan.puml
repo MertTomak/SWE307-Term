@@ -19,7 +19,7 @@ node "Vercel\n<<static hosting, CDN>>" as Vercel {
 }
 
 node "Render web service\n<<server>>" as Render {
-  node "Node.js >= 20.19\n<<execution environment>>" as NodeEnv {
+  node "Node.js >= 22\n<<execution environment>>" as NodeEnv {
     artifact "campusslot-backend\nExpress API + SystemScheduler\n(scheduler runs every 60 s)" as BackendArt
   }
 }
