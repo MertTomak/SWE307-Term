@@ -60,7 +60,7 @@ MANIFEST = [
      ["5.8_architecture-stack_Batuhan.md", "5.8_api-design_Batuhan.md",
       "5.8.5_security-privacy_Batuhan.md"], "Batuhan", None),
     ("5.9", "Alternative Approaches",
-     [], "Batuhan", "Not started. Weighted decision matrix needed (HANDOFFS H07)."),
+     ["5.9_alternatives_Batuhan.md"], "Batuhan", None),
     ("5.10", "Feasibility Analysis",
      ["5.10_feasibility_Mert.md"], "Mert", None),
     ("5.11", "Value and Benefit Analysis",
