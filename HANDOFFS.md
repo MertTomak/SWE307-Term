@@ -10,7 +10,7 @@ One list of open hand-offs between team members, so nobody has to read the commi
 - Status values: `Open` · `In progress` · `Blocked` (say why in **What**).
 - Dates are from the plan in `docs/report/5.5_planning_Mert.md` and the task document. Overdue items are marked ⚠.
 
-Last updated: 25 Nov 2026, evening (Görkem: H12 and H32 done, H31 added).
+Last updated: 25 Nov 2026, evening (Görkem: H12, H32, H34 done; H31, H33 added).
 
 ## Open
 
@@ -34,6 +34,7 @@ Last updated: 25 Nov 2026, evening (Görkem: H12 and H32 done, H31 added).
 | H10 | Mert | Zeynep, Erol | Confirm or change the PM defaults D1–D4. The API contract already follows them. | 25 Nov | Open | 5.4.2a |
 | H11 | Enes | Arzum | Screen designs and user flow. | 23 Nov | In progress | `docs/diagrams/5.7_ui-*_Arzum.png` |
 | H31 | Görkem | Zeynep (Mert as draft author) | 5.4 FR tables: take the UC column from the FR → UC table in 5.6.3. Three FRs had no UC or only a feature there: FR-31 → UC-07, FR-54 → UC-08, FR-55 → UC-09. | 1 Dec | Open | `docs/report/5.6_use-cases_Gorkem.md` 5.6.3 |
+| H33 | Görkem | Erol | Testability for the automated tests (28 Nov): (1) business code and scheduler read the time from one function (for example `clock.now()`) that a test can replace, or work with Vitest fake timers; (2) each scheduler job J1–J4 can be called directly as a function; (3) `DATABASE_URL` can point to a separate test database. Without (1) the boundary tests TC-25, TC-33, TC-35 to TC-40 cannot run. | 27 Nov | Open | 5.12.8 TP-A2, TP-A3 |
 | H13 | Mert | Everyone | Full name, student ID and course section for the 5.13 matrix. | 23 Nov | Open | `docs/report/5.13-5.14_report-text_Mert.md` |
 | H14 | Mert | Everyone | Your AI usage row for 5.14 (section, tool, purpose, reviewer). | when your part is done | Open | `docs/report/5.13-5.14_report-text_Mert.md` |
 
@@ -53,3 +54,4 @@ Last updated: 25 Nov 2026, evening (Görkem: H12 and H32 done, H31 added).
 | H28 | Batuhan | Mert | KVKK Art. 9 (transfer abroad) added to 5.10.2: the three mechanisms in order (adequacy decision / appropriate safeguards / occasional transfer) from the implementing regulation of 10 July 2024, the standard-contract route and its five-business-day notification duty, why the occasional-transfer route does not cover ordinary hosting, and the recommendation to host in Turkey. The pilot decision from 5.8.5.5 (seed users only) is carried over. The questions that need the university are now H29; the two unverified sources are H30. | 25 Nov | 5.10.2 "Transfer of personal data abroad (Art. 9)" |
 | H12 | Görkem, Mert | Görkem | 5.6 Use case diagram (4 actors + Campus User, UC-01 to UC-10, one `<<include>>`, one `<<extend>>`), 10 fully-dressed use case descriptions with alternative flows, error codes and API endpoints, and the FR → UC traceability table (all 55 FRs). PNG rendered on 25 Nov with PlantUML 1.2026.10. | 25 Nov | `docs/report/5.6_use-cases_Gorkem.md`, `docs/diagrams/5.6_use-case-diagram_Gorkem.puml/.png` |
 | H32 | Erol, Batuhan | Görkem | 5.6 Decision tables: DT-1 reservation request (R1–R5, 32 → 6 rules) and DT-2 check-in, no-show and penalty (R7–R9, 32 → 7 rules), step-by-step reduction, boundary values for the tests, and a script that checks the reduced tables. Erol: DT-1 follows the rule order R1, R4, R2, R3 of 5.8.4.7 and DT-2 the check-in window and J1; if the code uses another order, tell Görkem. | 25 Nov | `docs/report/5.6_decision-tables_Gorkem.md`, `docs/report/5.6_decision-tables_Gorkem.py` |
+| H34 | Everyone | Görkem | 5.12 Test plan: approach, environment and seed test data, 52 test cases (TC-01 to TC-52) with boundary values, every reduced decision-table rule and FR-01 to FR-55 covered, ST-01 to ST-15 included, entry/exit criteria, defect handling through GitHub Issues. Actual results are filled in after the run (1–3 Dec). | 25 Nov | `docs/report/5.12_test-plan_Gorkem.md` |

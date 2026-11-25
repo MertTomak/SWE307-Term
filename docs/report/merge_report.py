@@ -66,7 +66,9 @@ MANIFEST = [
     ("5.11", "Value and Benefit Analysis",
      ["5.11_operating-costs_Mert.md"], "Mert", None),
     ("5.12", "Implementation and Testing",
-     [], "Görkem", "Not started. Needs a working backend first."),
+     ["5.12_test-plan_Gorkem.md"], "Görkem",
+     "Partial: test plan done. Test results, screenshots and run "
+     "instructions after the test run (1-3 Dec)."),
     ("5.13-5.14", "Team Roles and Contribution Matrix / AI Usage Statement",
      ["5.13-5.14_report-text_Mert.md"], "Mert", None),
     ("5.15", "References",
