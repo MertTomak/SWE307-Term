@@ -53,3 +53,11 @@ npm run dev:phone
 5. Expected: "You are checked in · Study Room A-101". Also try the 6-digit code, and "Don't allow" for the camera (the page must offer the code field).
 
 In this mode the API address is relative (`/api/v1`) and the mock API runs inside the Vite server, not in the browser: browsers refuse the Service Worker that MSW needs when the certificate is self-made (see `phoneMockApi` in `vite.config.ts`). Mock data then lives in the server's memory until you stop `npm run dev:phone`. If Windows asks whether Node.js may use the network, allow it for private networks.
+
+**With the real backend** (database and API running, see the main README):
+
+```bash
+npm run dev:phone:api
+```
+
+Same steps, but Vite forwards `/api/v1` to the backend on `http://localhost:3000` (proxy), so the phone uses the real database and the demo accounts. The phone can only check in to a reservation that is in the check-in window (10 minutes before to 15 minutes after its start). To show the QR code of a real room on the computer, open `https://localhost:5173/dev/qr-test?text=<qrToken>&name=<room>&code=<checkInCode>` with the values from `GET /admin/resources` (E17).
