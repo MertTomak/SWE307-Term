@@ -72,3 +72,18 @@ export function userFromAuthHeader(header: string | null): MockUser | undefined 
   if (!token?.startsWith(TOKEN_PREFIX)) return undefined
   return findUserById(token.slice(TOKEN_PREFIX.length))
 }
+
+// One fictional door for testing the Check-in page (H23). The real server generates these per resource (E18).
+export interface MockDoor {
+  resource: { id: string; name: string; type: 'ROOM'; location: string }
+  /** Text inside the QR code on the door (method QR_SCAN). */
+  qrToken: string
+  /** 6 digits printed under the QR code (method MANUAL_CODE). */
+  checkInCode: string
+}
+
+export const DEMO_DOOR: MockDoor = {
+  resource: { id: 'r-demo-a101', name: 'Study Room A-101', type: 'ROOM', location: 'Block B, floor 1' },
+  qrToken: 'campusslot-demo-qr-a101',
+  checkInCode: '482913',
+}

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { AuthProvider } from './auth/AuthProvider'
 import { RequireRole } from './auth/RequireRole'
@@ -9,7 +10,6 @@ import AdminReportsPage from './pages/admin/AdminReportsPage'
 import AdminResourcesPage from './pages/admin/AdminResourcesPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
-import CheckInPage from './pages/campus/CheckInPage'
 import MyReservationsPage from './pages/campus/MyReservationsPage'
 import NewReservationPage from './pages/campus/NewReservationPage'
 import HomeRedirect from './pages/shared/HomeRedirect'
@@ -17,6 +17,15 @@ import NotFoundPage from './pages/shared/NotFoundPage'
 import NotificationsPage from './pages/shared/NotificationsPage'
 import ResourceDetailPage from './pages/shared/ResourceDetailPage'
 import ResourceSearchPage from './pages/shared/ResourceSearchPage'
+
+// Check-in carries the QR library (about 480 kB). It is loaded only when the page is opened,
+// so the other pages stay small ("lazy loading").
+const CheckInPage = lazy(() => import('./pages/campus/CheckInPage'))
+
+// Development only (H23). In `npm run build` DEV is false, so this import is removed from the bundle.
+const QrTestPage = import.meta.env.DEV ? lazy(() => import('./pages/dev/QrTestPage')) : null
+
+const loading = <p className="page-status">Loading…</p>
 
 // Route map. Access per role follows the access table in 5.4 (FR-05, D3).
 export default function App() {
@@ -40,7 +49,7 @@ export default function App() {
               <Route element={<RequireRole roles={CAMPUS_USER_ROLES} />}>
                 <Route path="reservations/new" element={<NewReservationPage />} />
                 <Route path="my-reservations" element={<MyReservationsPage />} />
-                <Route path="check-in" element={<CheckInPage />} />
+                <Route path="check-in" element={<Suspense fallback={loading}><CheckInPage /></Suspense>} />
               </Route>
 
               {/* RESOURCE_ADMIN */}
@@ -52,6 +61,9 @@ export default function App() {
               </Route>
             </Route>
           </Route>
+
+          {/* Development only: test QR code for the phone test of the Check-in page (H23). Removed from the build. */}
+          {QrTestPage && <Route path="/dev/qr-test" element={<Suspense fallback={loading}><QrTestPage /></Suspense>} />}
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

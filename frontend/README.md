@@ -37,3 +37,19 @@ The backend server is not built yet, so the screens can run against a fake API i
 - Fake users: `src/mocks/db.ts` (one student, one academic staff, one admin; the test password is `MOCK_PASSWORD` in that file). Users registered in the app are kept in `sessionStorage` until the tab is closed.
 - Covered so far: E01 register, E02 log in (with the 5-failure rate limit), E03 current user.
 - When the backend runs: set `VITE_USE_MOCKS=false`.
+
+## Testing the QR check-in on a phone
+
+A phone's browser gives the camera only to a secure page (HTTPS). `npm run dev` is plain HTTP, so use:
+
+```bash
+npm run dev:phone
+```
+
+1. The computer and the phone must be on the same Wi-Fi. Vite prints a `Network:` address, for example `https://192.168.1.20:5173/`.
+2. On the computer, open `https://localhost:5173/dev/qr-test`. It shows a test QR code and its 6-digit code (development only).
+3. On the phone, open the `Network:` address. The certificate is self-made, so the browser warns once: choose "Advanced" → "Proceed" (Chrome) or "Show Details" → "visit this website" (Safari).
+4. Log in as `student@campusslot.test` (mock password in `src/mocks/db.ts`), open **Check in**, allow the camera and point it at the QR code on the computer screen.
+5. Expected: "You are checked in · Study Room A-101". Also try the 6-digit code, and "Don't allow" for the camera (the page must offer the code field).
+
+In this mode the API address is relative (`/api/v1`) and the mock API is always on (see `vite.config.ts`). If Windows asks whether Node.js may use the network, allow it for private networks.

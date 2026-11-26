@@ -4,9 +4,9 @@
 // Endpoints without a handler here go to the real API (onUnhandledFrame: 'bypass').
 
 import { delay, http, HttpResponse, type DefaultBodyType, type PathParams } from 'msw'
-import type { ApiErrorBody, AuthResponse, MeResponse, Role } from '../api/types'
+import type { ApiErrorBody, AuthResponse, CheckInResponse, MeResponse, Role } from '../api/types'
 import { API_BASE_URL } from '../config'
-import { addUser, findUserByEmail, tokenFor, toUserDto, userFromAuthHeader } from './db'
+import { addUser, DEMO_DOOR, findUserByEmail, tokenFor, toUserDto, userFromAuthHeader } from './db'
 
 const url = (path: string) => API_BASE_URL + path
 
@@ -126,5 +126,51 @@ export const handlers = [
       activeReservationCount: 0,
       activeReservationLimit: limit,
     })
+  }),
+
+  // E11 Check in. Only step 1 of 5.8.4.8 (find the door) is real here. The mock pretends that the caller
+  // has a CONFIRMED reservation on the demo door that started 2 minutes ago, so the R7 window is not tested.
+  http.post<PathParams, DefaultBodyType, Answer<CheckInResponse>>(url('/check-ins'), async ({ request }) => {
+    await delay(NETWORK_DELAY_MS)
+    if (!userFromAuthHeader(request.headers.get('Authorization'))) {
+      return apiError(401, { code: 'UNAUTHENTICATED', message: 'Please log in again.' })
+    }
+    const body = await readJson(request)
+    const method = asString(body.method)
+    const code = asString(body.code)
+    if (method !== 'QR_SCAN' && method !== 'MANUAL_CODE') {
+      return validationError([{ path: 'method', message: 'Use QR_SCAN or MANUAL_CODE.' }])
+    }
+    if (method === 'MANUAL_CODE' && !/^\d{6}$/.test(code)) {
+      return validationError([{ path: 'code', message: 'Enter exactly 6 digits.' }])
+    }
+
+    const matches = method === 'QR_SCAN' ? code === DEMO_DOOR.qrToken : code === DEMO_DOOR.checkInCode
+    if (!matches) {
+      return apiError(404, { code: 'CHECKIN_CODE_INVALID', message: 'This code does not belong to any room, lab or equipment.' })
+    }
+
+    const now = new Date()
+    const start = new Date(now.getTime() - 2 * 60 * 1000)
+    const end = new Date(start.getTime() + 60 * 60 * 1000)
+    return HttpResponse.json<CheckInResponse>(
+      {
+        checkIn: { id: `c-${crypto.randomUUID()}`, checkedInAt: now.toISOString(), method },
+        reservation: {
+          id: 'res-demo-1',
+          resource: DEMO_DOOR.resource,
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
+          status: 'CHECKED_IN',
+          purpose: null,
+          rejectionReason: null,
+          decidedAt: null,
+          cancelledAt: null,
+          checkIn: { checkedInAt: now.toISOString(), method },
+          createdAt: start.toISOString(),
+        },
+      },
+      { status: 201 },
+    )
   }),
 ]
