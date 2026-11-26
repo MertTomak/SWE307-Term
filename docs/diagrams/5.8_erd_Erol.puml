@@ -1,0 +1,102 @@
+@startuml 5.8_erd_Erol
+' 5.8.3 Data model - CampusSlot entity-relationship diagram (crow's foot notation)
+' Owner: Erol (Backend Developer). Text: docs/report/5.8.3_data-model_Erol.md
+' Source of truth: backend/prisma/schema.prisma and backend/prisma/migrations (main)
+' Render: java -jar plantuml.jar -Playout=smetana -tpng <this file>
+title CampusSlot - Entity-Relationship Diagram (PostgreSQL)
+skinparam shadowing false
+skinparam linetype ortho
+hide circle
+
+entity "User" as User {
+  * id : text <<PK, uuid>>
+  --
+  * email : text <<unique>>
+  * passwordHash : text
+  * fullName : text
+  * role : Role
+  * createdAt : timestamptz(3)
+  * updatedAt : timestamptz(3)
+}
+
+entity "Resource" as Resource {
+  * id : text <<PK, uuid>>
+  --
+  * name : text
+  * type : ResourceType
+  * location : text
+  capacity : integer
+  description : text
+  * qrToken : text <<unique>>
+  * checkInCode : char(6) <<unique>>
+  * isActive : boolean = true
+  * createdAt : timestamptz(3)
+  * updatedAt : timestamptz(3)
+}
+
+entity "Reservation" as Reservation {
+  * id : text <<PK, uuid>>
+  --
+  * userId : text <<FK User>>
+  * resourceId : text <<FK Resource>>
+  * startTime : timestamptz(3)
+  * endTime : timestamptz(3)
+  * status : ReservationStatus
+  purpose : text
+  decidedById : text <<FK User>>
+  decidedAt : timestamptz(3)
+  rejectionReason : text
+  cancelledAt : timestamptz(3)
+  * createdAt : timestamptz(3)
+  * updatedAt : timestamptz(3)
+  --
+  EXCLUDE gist (resourceId =, [startTime, endTime) &&)
+  WHERE status IN (PENDING_APPROVAL, CONFIRMED, CHECKED_IN)
+}
+
+entity "CheckIn" as CheckIn {
+  * id : text <<PK, uuid>>
+  --
+  * reservationId : text <<FK Reservation, unique>>
+  * checkedInAt : timestamptz(3)
+  * method : CheckInMethod
+}
+
+entity "Penalty" as Penalty {
+  * id : text <<PK, uuid>>
+  --
+  * userId : text <<FK User>>
+  * reason : text
+  * noShowCount : integer
+  * startsAt : timestamptz(3)
+  * endsAt : timestamptz(3)
+  * createdAt : timestamptz(3)
+}
+
+entity "Notification" as Notification {
+  * id : text <<PK, uuid>>
+  --
+  * userId : text <<FK User>>
+  reservationId : text <<FK Reservation>>
+  * type : NotificationType
+  * message : text
+  * isRead : boolean = false
+  * createdAt : timestamptz(3)
+}
+
+User ||--o{ Reservation : "makes (userId)"
+User |o--o{ Reservation : "decides (decidedById)"
+Resource ||--o{ Reservation : "is booked in"
+Reservation ||--o| CheckIn : "has"
+User ||--o{ Penalty : "receives"
+User ||--o{ Notification : "receives"
+Reservation |o--o{ Notification : "is about"
+
+legend bottom left
+  * = NOT NULL. Enums: Role {STUDENT, ACADEMIC_STAFF, RESOURCE_ADMIN};
+  ResourceType {ROOM, LAB, EQUIPMENT}; ReservationStatus {PENDING_APPROVAL, CONFIRMED,
+  CHECKED_IN, COMPLETED, CANCELLED, NO_SHOW, REJECTED}; CheckInMethod {QR_SCAN, MANUAL_CODE};
+  NotificationType {RESERVATION_CONFIRMED, RESERVATION_PENDING, RESERVATION_APPROVED,
+  RESERVATION_REJECTED, RESERVATION_CANCELLED, CHECK_IN_REMINDER, NO_SHOW_RECORDED, PENALTY_APPLIED}.
+endlegend
+@enduml
