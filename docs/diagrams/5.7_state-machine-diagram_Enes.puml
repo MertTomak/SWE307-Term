@@ -23,8 +23,8 @@ state REJECTED : entry / set rejectionReason,\nnotify RESERVATION_REJECTED
 R5choice --> PENDING_APPROVAL : [resource.type = EQUIPMENT]\n/ notify RESERVATION_PENDING
 R5choice --> CONFIRMED : [resource.type = ROOM or LAB]\n/ notify RESERVATION_CONFIRMED
 
-PENDING_APPROVAL --> CONFIRMED : approve (Resource Admin, E15)\n/ set decidedById, decidedAt,\nnotify RESERVATION_APPROVED
-PENDING_APPROVAL --> REJECTED : reject(reason) (Resource Admin, E16)\n/ set decidedById, decidedAt
+PENDING_APPROVAL --> CONFIRMED : approve (Resource Admin, E15)\n[now < startTime]\n/ set decidedById, decidedAt,\nnotify RESERVATION_APPROVED
+PENDING_APPROVAL --> REJECTED : reject(reason) (Resource Admin, E16)\n[now < startTime]\n/ set decidedById, decidedAt
 PENDING_APPROVAL --> REJECTED : J3 when now >= startTime (D4)\n/ reason "Not approved before the start time"
 PENDING_APPROVAL --> CANCELLED : cancel (owner, E10)\n[now < startTime] (R6)
 
