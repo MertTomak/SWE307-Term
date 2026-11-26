@@ -10,7 +10,7 @@ One list of open hand-offs between team members, so nobody has to read the commi
 - Status values: `Open` · `In progress` · `Blocked` (say why in **What**).
 - Dates are from the plan in `docs/report/5.5_planning_Mert.md` and the task document. Overdue items are marked ⚠.
 
-Last updated: 25 Nov 2026, late evening (Mert: H36 done, H35 permission confirmed on but unproven by a real run, H30 part (a) done. Before: Batuhan H07, H24, H37, H39, H43 done; H06 draft; H38, H40–H42 added. Before that: Görkem H12, H32, H34 done; H31, H33, H35–H37 open).
+Last updated: 26 Nov 2026 (Mert: eighth member Yağız Asker added to 5.13, 5.11, 5.5, 5.10, 5.1; H44, H45 added. Before, 25 Nov late evening, Mert: H36 done, H35 permission confirmed on but unproven by a real run, H30 part (a) done. Before: Batuhan H07, H24, H37, H39, H43 done; H06 draft; H38, H40–H42 added. Before that: Görkem H12, H32, H34 done; H31, H33, H35–H37 open).
 
 ## Open
 
@@ -39,6 +39,8 @@ Last updated: 25 Nov 2026, late evening (Mert: H36 done, H35 permission confirme
 | H42 | Görkem, Batuhan | Erol | Set `"engines": { "node": ">=22" }` in `backend/package.json`, so npm warns on an older Node.js. README already says Node.js 22 (H37). | 1 Dec | Open | `backend/package.json` |
 | H13 | Mert | Everyone | Full name, student ID and course section for the 5.13 matrix. | 23 Nov | Open | `docs/report/5.13-5.14_report-text_Mert.md` |
 | H14 | Mert | Everyone | Your AI usage row for 5.14 (section, tool, purpose, reviewer). | when your part is done | Open | `docs/report/5.13-5.14_report-text_Mert.md` |
+| H44 | Mert, Arzum | Yağız Asker (new member) | Send Mert: full name, student ID, course section, the **date he joined**, and which work he takes. He must be in the group registration Excel before **30 Nov 23:59** (no changes after that). The 5.13 row, the 5.11 effort (C17: 33 h from a provisional 26 Nov start) and the slide team table (8 rows) wait for this. Suggested open work: 5.12 test run and screenshots with Görkem, 5.15 references with Arzum, DFD or fishbone from Zeynep, slides and video with Arzum. The team decides; the row lists only what he really does. | 28 Nov | Open | `docs/report/5.13-5.14_report-text_Mert.md`, 5.11 C17 |
+| H45 | Mert | Mert | Group registration Excel: enter Yağız Asker as the 8th member (6–8 allowed). Group name: CampusSlot. | 30 Nov 23:59 | Open | registration file |
 
 ## Done
 

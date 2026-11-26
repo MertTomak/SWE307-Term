@@ -39,7 +39,11 @@ SLOT_HOURS = 2.0           # C16. Average reservation length.
 # Development cost -- opportunity cost, not cash (C17).
 # --------------------------------------------------------------------------
 MEMBERS, PROJECT_DAYS, HOURS_PER_DAY = 7, 19, 3.0   # 5.5 plan; 3 h/day per FP20.
-DEV_HOURS = MEMBERS * PROJECT_DAYS * HOURS_PER_DAY  # = 399 h
+# An eighth member (Yagiz Asker) joined late. Effort is hours actually worked,
+# not headcount x project days, so he counts only from his join date to 6 Dec.
+# [TBD: confirm the join date; 26 Nov is provisional -> 11 days incl. 26 Nov and 6 Dec]
+LATE_MEMBERS, LATE_DAYS = 1, 11
+DEV_HOURS = (MEMBERS * PROJECT_DAYS + LATE_MEMBERS * LATE_DAYS) * HOURS_PER_DAY  # = 432 h
 
 HORIZON = 3       # C18. Years. 5 as sensitivity.
 COCOMO_PM = 14.38  # Person-months from Basic COCOMO, organic mode (5.5.8).

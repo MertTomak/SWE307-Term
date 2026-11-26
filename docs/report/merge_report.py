@@ -42,7 +42,7 @@ MANIFEST = [
     ("5.2", "Problem Definition, Scope and Stakeholders",
      [], "Zeynep", "Not started. Depends on fact-finding (survey/interviews)."),
     ("5.3", "Academic Literature Review",
-     [], "Arzum", "In progress. 8 peer-reviewed sources verified by PM; write-up pending."),
+     ["5.3_literature-review_Arzum.md"], "Arzum", None),
     ("5.4", "Fact-Finding and Requirements Analysis",
      ["5.4_requirements_Mert.md"], "Zeynep (PM draft)", None),
     ("5.5", "Software Process Model and Project Management",
