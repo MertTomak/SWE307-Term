@@ -41,13 +41,30 @@ npm run dev                   # http://localhost:5173
 ```bash
 cd backend
 npm install
-cp .env.example .env          # then edit DATABASE_URL
+cp .env.example .env          # then set DATABASE_URL and JWT_SECRET
 npm run prisma:generate       # generates the Prisma Client
-npm run prisma:deploy         # creates the tables
-npm run db:seed               # demo data
+npm run prisma:deploy         # creates the tables and the R3 overlap constraint
+npm run db:seed               # demo data (see below)
+npm run dev                   # API on http://localhost:3000/api/v1 with auto-reload
 ```
 
-The API server (Express) is not in the repository yet. Its start command and port are added here by the Backend Developer.
+`npm start` runs the API without auto-reload (hosting). The port is `PORT` in `.env`, default `3000`, which is what the frontend expects. `GET /api/v1/health` answers `{ "status": "ok" }`. The System Scheduler (no-shows, penalties, completion, reminders) runs inside the API process every 60 seconds; `SCHEDULER_ENABLED=false` turns it off.
+
+**Without Docker or a PostgreSQL install** (development only): `npm run db:local` starts a PostgreSQL (PGlite, compiled to WebAssembly) on port 5433 and prints the `DATABASE_URL` to use. Keep it running in a second terminal and set `DB_POOL_MAX=1` in `.env`. CI, the demo and production use a real PostgreSQL server.
+
+**Demo accounts** (`npm run db:seed`): `admin@campusslot.test` (Resource Admin), `staff1@` and `staff2@campusslot.test` (Academic Staff), `student1@` to `student4@campusslot.test` (Student). All use the password in `SEED_PASSWORD` (default `CampusSlot123!`; the demo database must be seeded with a secret one). The names are fictional. 13 resources (5 rooms, 4 labs, 4 pieces of equipment) with door codes `100001` to `100013`, and reservations in all 7 statuses. The seed deletes all existing rows first.
+
+**Tests**: `npm test` (details and the test database in `backend/tests/README.md`). For a local test database: `npm run db:local -- --memory --database campusslot_test --port 5434`, then `DATABASE_URL_TEST="postgresql://postgres:postgres@127.0.0.1:5434/campusslot_test?sslmode=disable"` and `DB_POOL_MAX=1`.
+
+| Command | What it does |
+|---|---|
+| `npm run dev` / `npm start` | Start the API (with / without auto-reload) |
+| `npm test` / `npm run test:full` | Run the backend tests (skip missing parts / strict) |
+| `npm run typecheck` | TypeScript type check |
+| `npm run db:seed` | Reset the demo data |
+| `npm run db:reset` | Drop the database, re-apply all migrations and re-seed |
+| `npm run db:local` | Local PostgreSQL without Docker (development only) |
+| `npx prisma studio` | Browse the database in the browser |
 
 ## How we work
 

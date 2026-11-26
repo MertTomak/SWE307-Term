@@ -1,0 +1,2 @@
+# Local development database (npm run db:local)
+.pglite/
