@@ -115,6 +115,10 @@ def build_assumptions() -> Sheet:
         ("Project days", 19, "5.5 plan, 18 Nov - 6 Dec 2026"),
         ("Hours per day, part-time", 3.0, "FPA assumption FP20"),
         ("Horizon, years", 3, "C18"),
+        ("Late-joining members", 1,
+         "Yagiz Asker joined after kickoff (C17)"),
+        ("Days worked by the late member", 11,
+         "Provisional join date 26 Nov -> 11 days to 6 Dec. [TBD: confirm]"),
     ]
     for i, (label, value, note) in enumerate(rows, start=3):
         sh.set_text(i, 1, label)
@@ -135,7 +139,8 @@ def build_cost_benefit(a: dict) -> tuple[Sheet, dict]:
     bookings = a["resources"] * a["bookings_per_res_week"] * a["term_weeks"]
     admin_h = bookings * a["minutes"] / 60
     benefit = admin_h * a["rate"]
-    dev_h = a["members"] * a["days"] * a["hours_per_day"]
+    dev_h = (a["members"] * a["days"] + a["late_members"] * a["late_days"]) \
+        * a["hours_per_day"]
     dev_cost = dev_h * a["rate"]
     opex = a["opex_b"]
     net = benefit - opex
@@ -147,7 +152,10 @@ def build_cost_benefit(a: dict) -> tuple[Sheet, dict]:
     sh.set_text(5, 1, "Benefit per year, TL")
     sh.set_formula(5, 2, "B4*Assumptions!B3", benefit)
     sh.set_text(6, 1, "Development hours")
-    sh.set_formula(6, 2, "Assumptions!B15*Assumptions!B16*Assumptions!B17", dev_h)
+    sh.set_formula(
+        6, 2,
+        "(Assumptions!B15*Assumptions!B16+Assumptions!B19*Assumptions!B20)"
+        "*Assumptions!B17", dev_h)
     sh.set_text(7, 1, "Development cost, TL (opportunity cost, C17)")
     sh.set_formula(7, 2, "B6*Assumptions!B3", dev_cost)
     sh.set_text(8, 1, "Operating cost per year, TL (Scenario B)")
@@ -245,7 +253,8 @@ def build_sensitivity(a: dict) -> Sheet:
             benefit = a["resources"] * a["bookings_per_res_week"] * a["term_weeks"] \
                 * m / 60 * a["rate"]
             net = benefit - a["opex_b"]
-            dev_cost = a["members"] * a["days"] * a["hours_per_day"] * a["rate"]
+            dev_cost = (a["members"] * a["days"] + a["late_members"] * a["late_days"]) \
+                * a["hours_per_day"] * a["rate"]
             npv = -dev_cost + net * af3
             formula = (
                 f"-CostBenefit!$B$7+"
@@ -337,6 +346,7 @@ ASSUMPTIONS = dict(
     rate=178.73, opex_b=61791.10, discount=0.36,
     resources=13, bookings_per_res_week=10, term_weeks=30, minutes=10,
     members=7, days=19, hours_per_day=3.0, horizon=3,
+    late_members=1, late_days=11,
 )
 
 
@@ -348,9 +358,9 @@ def build(check: bool = False):
 
     if check:
         expected = dict(bookings=3900, admin_h=650.0, benefit=116174.50,
-                        dev_h=399, dev_cost=71313.27, net=54383.40,
-                        npv=19697.01, roi_undisc=35.78, roi_disc=11.27,
-                        payback_simple=1.31, payback_disc=2.09)
+                        dev_h=432, dev_cost=77211.36, net=54383.40,
+                        npv=13798.92, roi_undisc=32.73, roi_disc=7.64,
+                        payback_simple=1.42, payback_disc=2.36)
         ok = True
         for k, exp in expected.items():
             got = results[k]

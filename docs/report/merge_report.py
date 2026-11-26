@@ -42,7 +42,7 @@ MANIFEST = [
     ("5.2", "Problem Definition, Scope and Stakeholders",
      [], "Zeynep", "Not started. Depends on fact-finding (survey/interviews)."),
     ("5.3", "Academic Literature Review",
-     [], "Arzum", "In progress. 8 peer-reviewed sources verified by PM; write-up pending."),
+     ["5.3_literature-review_Arzum.md"], "Arzum", None),
     ("5.4", "Fact-Finding and Requirements Analysis",
      ["5.4_requirements_Mert.md"], "Zeynep (PM draft)", None),
     ("5.5", "Software Process Model and Project Management",
@@ -58,7 +58,7 @@ MANIFEST = [
       "5.7_design-patterns_Batuhan.md", "5.7_class-diagram_Erol.md"],
      "Batuhan / Enes / Erol",
      "Partial: component, deployment, state machine, design patterns (draft) and "
-     "class diagram (Erol, PNG pending H44) done. Sequence diagram still missing."),
+     "class diagram (Erol, PNG pending H47) done. Sequence diagram still missing."),
     ("5.8", "Technical Architecture",
      ["5.8_architecture-stack_Batuhan.md", "5.8.3_data-model_Erol.md",
       "5.8_api-design_Batuhan.md", "5.8.5_security-privacy_Batuhan.md"],
