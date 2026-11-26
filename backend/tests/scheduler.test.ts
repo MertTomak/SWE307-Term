@@ -67,7 +67,7 @@ describe.skipIf(!runSchedulerOnce)("UC-09 System Scheduler (DT-2)", () => {
     const other = await createUser("STUDENT");
     const room = await createResource("ROOM");
     await createReservation({ userId: owner.id, resourceId: room.id, start: START, end: plus(START, HOUR), status: "CONFIRMED" });
-    const token = await login(app, other.email);
+    let token = await login(app, other.email);
     const calendar = () =>
       request(app!).get(`${API}/resources/${room.id}/availability`).query({ date: "2026-12-07" }).set(bearer(token));
 
@@ -78,6 +78,8 @@ describe.skipIf(!runSchedulerOnce)("UC-09 System Scheduler (DT-2)", () => {
 
     // ... after the scheduler marks it NO_SHOW, the calendar shows it as free (FR-40, plan step 3).
     await runAt(plus(START, 16 * MINUTE));
+    // The token from 08:00 expired at 09:00 (1-hour lifetime, NFR-02): log in again at 10:16.
+    token = await login(app, other.email);
     const after = await calendar();
     expect(after.status).toBe(200);
     expect(after.body.bookedSlots).toEqual([]);

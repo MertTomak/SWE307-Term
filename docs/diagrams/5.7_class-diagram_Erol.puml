@@ -1,0 +1,304 @@
+@startuml 5.7_class-diagram_Erol
+' 5.7 Class diagram - CampusSlot backend (classes, fields and methods as in backend/src)
+' Owner: Erol (Backend Developer). Text: docs/report/5.7_class-diagram_Erol.md
+' Entities (tables) are in the ERD: docs/diagrams/5.8_erd_Erol.puml
+' Render: java -jar plantuml.jar -Playout=smetana -tpng <this file>
+title CampusSlot Backend - Class Diagram
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+hide empty members
+
+package "Application layer: HTTP (backend/src/http)" as HTTP {
+  class FailureLimiter <<Chain link: rate limit>> {
+    - failures : Map<string, number[]>
+    - options : FailureLimiterOptions
+    + middleware() : RequestHandler
+    - recent(key, now) : number[]
+  }
+  class "middleware" as MW <<Chain of Responsibility>> {
+    + requireAuth(req, res, next)
+    + requireRole(...roles) : RequestHandler
+    + validate(schemas) : RequestHandler
+    + errorHandler(error, req, res, next)
+  }
+  class "mappers" as Mappers <<DTO + Mapper>> {
+    + toUserDto(user)
+    + toResourceDto(resource)
+    + toAdminResourceDto(resource)
+    + toReservationDto(reservation)
+    + toAdminReservationDto(reservation)
+    + toNotificationDto(notification)
+    + toPenaltyDto(penalty)
+  }
+  class "routes / controllers" as Routes {
+    + apiRouter() : Router
+    + createApp() : Express
+  }
+}
+
+package "Application layer: services (backend/src/services)" as SVC {
+  class AuthService {
+    - r : Repositories
+    + register(input) : {token, expiresIn, user}
+    + login(email, password) : {token, expiresIn, user}
+    + me(userId, now)
+  }
+  class ResourceService {
+    - r : Repositories
+    + search(filter, page, pageSize)
+    + getVisible(id, role) : Resource
+    + availability(id, date, role)
+    + create(input, adminId) : Resource
+    + update(id, changes, adminId) : Resource
+  }
+  class ReservationService {
+    - r : Repositories
+    - inTransaction
+    + create(caller, input, now) : Reservation
+    + listMine(userId, statuses, page, pageSize)
+    + get(caller, id) : Reservation
+    + cancel(caller, id, now) : Reservation
+    + listPending(page, pageSize)
+    + approve(adminId, id, now) : Reservation
+    + reject(adminId, id, reason, now) : Reservation
+    - loadForDecision(id, event, now)
+    - applyTransition(reservation, event, to, data, sideEffects)
+  }
+  class CheckInService {
+    - r : Repositories
+    - inTransaction
+    + checkIn(userId, method, code, now) : {checkIn, reservation}
+  }
+  class NotificationService {
+    - r : Repositories
+    + list(userId, unreadOnly, page, pageSize)
+    + markRead(userId, id) : Notification
+    .. module functions ..
+    + notify(repos, userId, type, message, reservationId)
+  }
+  class ReportService {
+    - r : Repositories
+    + usage(from, to, type)
+    + noShows(from, to, page, pageSize)
+    + penalties(activeOnly, now, page, pageSize)
+  }
+}
+
+package "Application layer: System Scheduler (backend/src/jobs)" as JOBS {
+  interface Job {
+    + name : string
+    + run(now : Date) : JobResult
+  }
+  abstract class ReservationJob {
+    # r : Repositories
+    # inTransaction
+    # eachRow(rows, handle) : JobResult
+    + {abstract} run(now : Date) : JobResult
+  }
+  class AutoRejectJob <<J3>> {
+    + {static} REASON : string
+    + run(now) : JobResult
+  }
+  class NoShowJob <<J1>> {
+    + run(now) : JobResult
+  }
+  class CompleteJob <<J2>> {
+    + run(now) : JobResult
+  }
+  class ReminderJob <<J4>> {
+    + run(now) : JobResult
+  }
+  class SystemScheduler {
+    + jobs : Job[]
+    - timer
+    - running : boolean
+    + runOnce(now : Date) : JobResult[]
+    + start(intervalMs)
+    + stop()
+  }
+}
+
+package "Domain layer (backend/src/domain): no Express, no Prisma, time passed in" as DOM {
+  interface ReservationRule <<Strategy>> {
+    + id : "R1" | "R2" | "R3" | "R4"
+    + check(ctx : RuleContext) : RuleViolation | null
+  }
+  class RuleContext <<interface>> {
+    + role : CampusUserRole
+    + start : Date
+    + end : Date
+    + now : Date
+    + activeReservationCount : number
+    + runningPenaltyEndsAt : Date | null
+    + overlappingCount : number
+  }
+  class DurationRule <<R1>> {
+    + id = "R1"
+    + check(ctx) : RuleViolation | null
+  }
+  class PenaltyRule <<R4>> {
+    + id = "R4"
+    + check(ctx) : RuleViolation | null
+  }
+  class ActiveLimitRule <<R2>> {
+    + id = "R2"
+    + check(ctx) : RuleViolation | null
+  }
+  class OverlapRule <<R3>> {
+    + id = "R3"
+    + check(ctx) : RuleViolation | null
+  }
+  class "rules" as Rules <<module>> {
+    + RESERVATION_RULES : ReservationRule[]  (R1, R4, R2, R3)
+    + ACTIVE_RESERVATION_LIMITS : {STUDENT: 2, ACADEMIC_STAFF: 5}
+    + firstViolation(ctx, rules) : RuleViolation | null
+    + initialStatusFor(type) : ReservationStatus  (R5)
+  }
+  class ReservationStateMachine <<State (table-driven)>> {
+    - TRANSITIONS : Record<ReservationStatus, Record<ReservationEvent, ReservationStatus>>
+    + next(from, event) : ReservationStatus
+    + can(from, event) : boolean
+    + transitions() : [from, event, to][]
+  }
+  class DomainError {
+    + code : ErrorCode
+    + rule? : RuleId
+    + details? : Record<string, unknown>
+  }
+  class InvalidStateTransition {
+    + from : ReservationStatus
+    + event : ReservationEvent
+  }
+  class "checkIn / penaltyPolicy / time / reports" as DomainFns <<module>> {
+    + chooseReservationForCheckIn(reservations, now)  (R7)
+    + decidePenalty(noShowsInWindow, hasRunningPenalty, now)  (R9)
+    + checkInWindow(start), noShowStartedBefore(now), canCancelAt(start, now)  (R6-R8)
+    + usageFigures(reservations, days, openingHoursPerDay)
+  }
+}
+
+package "Data layer (backend/src/repositories, backend/src/db)" as DATA {
+  class Repositories <<interface>> {
+    + users : UserRepository
+    + resources : ResourceRepository
+    + reservations : ReservationRepository
+    + checkIns : CheckInRepository
+    + penalties : PenaltyRepository
+    + notifications : NotificationRepository
+    .. module functions ..
+    + repositoriesFor(db) : Repositories
+    + inTransaction(work) : T
+  }
+  class UserRepository <<Repository>> {
+    + findByEmail(email)
+    + findById(id)
+    + create(data)
+    + lockForUpdate(id)
+    + findManyByIds(ids)
+  }
+  class ResourceRepository <<Repository>> {
+    + search(filter, skip, take)
+    + findById(id)
+    + findByQrToken(qrToken)
+    + findByCheckInCode(code)
+    + findAll(type)
+    + create(data)
+    + update(id, data)
+  }
+  class ReservationRepository <<Repository>> {
+    + countActiveByUser(userId, now)
+    + countOverlapping(resourceId, start, end)
+    + create(data)
+    + findById(id)
+    + findByUser(userId, statuses, skip, take)
+    + findPendingApproval(skip, take)
+    + findBookedSlots(resourceId, from, to)
+    + findForCheckIn(userId, resourceId)
+    + transition(id, from, to, data) : boolean
+    + findPendingStartedBy(now)
+    + findConfirmedStartedBefore(time)
+    + findCheckedInEndedBy(now)
+    + findReminderDue(now, startsUntil)
+    + countNoShowsSince(userId, since)
+    + findStartingBetween(from, to, statuses, type)
+    + noShowsByUser(from, to)
+  }
+  class CheckInRepository <<Repository>> {
+    + create(reservationId, method, checkedInAt)
+  }
+  class PenaltyRepository <<Repository>> {
+    + findRunning(userId, now)
+    + create(data)
+    + list(activeOnly, now, skip, take)
+  }
+  class NotificationRepository <<Repository>> {
+    + create(data)
+    + listForUser(userId, unreadOnly, skip, take)
+    + findById(id)
+    + markRead(id)
+  }
+  class "prisma" as PrismaSingleton <<Singleton>> {
+    + prisma : PrismaClient
+  }
+}
+
+' Strategy
+DurationRule ..|> ReservationRule
+PenaltyRule ..|> ReservationRule
+ActiveLimitRule ..|> ReservationRule
+OverlapRule ..|> ReservationRule
+ReservationRule ..> RuleContext : reads
+Rules o-- "4" ReservationRule : ordered list
+ReservationService ..> Rules : firstViolation(), initialStatusFor()
+
+' State
+InvalidStateTransition --|> DomainError
+ReservationStateMachine ..> InvalidStateTransition : throws
+ReservationService ..> ReservationStateMachine : next()
+CheckInService ..> ReservationStateMachine : next("checkIn")
+ReservationJob ..> ReservationStateMachine : next()
+
+' Domain functions
+CheckInService ..> DomainFns : chooseReservationForCheckIn()
+NoShowJob ..> DomainFns : decidePenalty()
+ReportService ..> DomainFns : usageFigures()
+
+' Repository
+Repositories *-- UserRepository
+Repositories *-- ResourceRepository
+Repositories *-- ReservationRepository
+Repositories *-- CheckInRepository
+Repositories *-- PenaltyRepository
+Repositories *-- NotificationRepository
+Repositories ..> PrismaSingleton : client or transaction
+AuthService --> Repositories
+ResourceService --> Repositories
+ReservationService --> Repositories
+CheckInService --> Repositories
+NotificationService --> Repositories
+ReportService --> Repositories
+ReservationJob --> Repositories
+
+' Scheduler
+ReservationJob ..|> Job
+AutoRejectJob --|> ReservationJob
+NoShowJob --|> ReservationJob
+CompleteJob --|> ReservationJob
+ReminderJob --|> ReservationJob
+SystemScheduler o-- "4" Job : J3, J1, J2, J4
+ReservationJob ..> NotificationService : notify()
+ReservationService ..> NotificationService : notify()
+
+' HTTP
+Routes ..> MW : chain per route
+Routes o-- "2" FailureLimiter : login, check-in
+Routes ..> Mappers
+Routes --> AuthService
+Routes --> ResourceService
+Routes --> ReservationService
+Routes --> CheckInService
+Routes --> NotificationService
+Routes --> ReportService
+MW ..> DomainError : maps to error format
+@enduml

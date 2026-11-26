@@ -1,5 +1,6 @@
 // CampusSlot development seed.
-// Wipes all tables and inserts demo data: 13 resources, users of every role,
+// Wipes all tables and inserts demo data: 13 resources, users of every role
+// (fictional Turkish names, never real students or staff: SEC-A3, H38),
 // reservations in all 7 statuses, check-ins, one active penalty and notifications.
 // Times are relative to the moment the seed runs, so the demo data stays current.
 // Campus time zone is Europe/Istanbul (fixed UTC+3, no DST since 2016).
@@ -10,8 +11,10 @@ import bcrypt from "bcryptjs";
 import type { Prisma, ResourceType } from "@prisma/client";
 import { prisma } from "../src/db/prisma.js";
 
-if (process.env.NODE_ENV === "production") {
-  throw new Error("Refusing to seed: NODE_ENV is production.");
+// The default password is public on GitHub. A demo or production database must be
+// seeded with a secret SEED_PASSWORD (5.8.5.2 A02, hand-off H27).
+if (process.env.NODE_ENV === "production" && !process.env.SEED_PASSWORD) {
+  throw new Error("Refusing to seed with the public default password: set SEED_PASSWORD.");
 }
 
 const SEED_PASSWORD = process.env.SEED_PASSWORD ?? "CampusSlot123!";
@@ -67,13 +70,13 @@ async function main() {
   const mkUser = (email: string, fullName: string, role: Prisma.UserCreateInput["role"]) =>
     prisma.user.create({ data: { email, fullName, role, passwordHash } });
 
-  const admin = await mkUser("admin@campusslot.test", "Resource Admin", "RESOURCE_ADMIN");
-  const staff1 = await mkUser("staff1@campusslot.test", "Academic Staff One", "ACADEMIC_STAFF");
-  const staff2 = await mkUser("staff2@campusslot.test", "Academic Staff Two", "ACADEMIC_STAFF");
-  const student1 = await mkUser("student1@campusslot.test", "Student One", "STUDENT");
-  const student2 = await mkUser("student2@campusslot.test", "Student Two", "STUDENT");
-  const student3 = await mkUser("student3@campusslot.test", "Student Three", "STUDENT");
-  const student4 = await mkUser("student4@campusslot.test", "Student Four", "STUDENT");
+  const admin = await mkUser("admin@campusslot.test", "Ayşe Yılmaz", "RESOURCE_ADMIN");
+  const staff1 = await mkUser("staff1@campusslot.test", "Mehmet Demir", "ACADEMIC_STAFF");
+  const staff2 = await mkUser("staff2@campusslot.test", "Elif Kaya", "ACADEMIC_STAFF");
+  const student1 = await mkUser("student1@campusslot.test", "Can Öztürk", "STUDENT");
+  const student2 = await mkUser("student2@campusslot.test", "Deniz Arslan", "STUDENT");
+  const student3 = await mkUser("student3@campusslot.test", "Burak Çelik", "STUDENT");
+  const student4 = await mkUser("student4@campusslot.test", "Selin Aydın", "STUDENT");
 
   const r: Record<string, { id: string }> = {};
   for (const [i, res] of resourceSeed.entries()) {
