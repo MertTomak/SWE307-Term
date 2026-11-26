@@ -52,4 +52,4 @@ npm run dev:phone
 4. Log in as `student@campusslot.test` (mock password in `src/mocks/db.ts`), open **Check in**, allow the camera and point it at the QR code on the computer screen.
 5. Expected: "You are checked in · Study Room A-101". Also try the 6-digit code, and "Don't allow" for the camera (the page must offer the code field).
 
-In this mode the API address is relative (`/api/v1`) and the mock API is always on (see `vite.config.ts`). If Windows asks whether Node.js may use the network, allow it for private networks.
+In this mode the API address is relative (`/api/v1`) and the mock API runs inside the Vite server, not in the browser: browsers refuse the Service Worker that MSW needs when the certificate is self-made (see `phoneMockApi` in `vite.config.ts`). Mock data then lives in the server's memory until you stop `npm run dev:phone`. If Windows asks whether Node.js may use the network, allow it for private networks.
