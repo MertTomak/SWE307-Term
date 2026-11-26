@@ -22,11 +22,19 @@ function phoneMockApi(): Plugin {
         try {
           // Loaded through Vite, so the TypeScript and import.meta.env in the handlers work here too.
           const { handlers } = (await server.ssrLoadModule('/src/mocks/handlers.ts')) as { handlers: RequestHandler[] }
-          const origin = `https://${req.headers.host ?? 'localhost'}`
+          // With HTTPS, Vite talks HTTP/2. Its header list also holds pseudo-headers (":path", ":authority")
+          // and a hidden symbol key, which a fetch Request does not accept. Copy only the normal headers.
+          const headers = new Headers()
+          for (const [name, value] of Object.entries(req.headers)) {
+            if (name.startsWith(':') || value === undefined) continue
+            headers.set(name, Array.isArray(value) ? value.join(', ') : value)
+          }
+          const host = req.headers[':authority'] ?? req.headers.host ?? 'localhost'
+          const origin = `https://${String(host)}`
           const hasBody = req.method !== 'GET' && req.method !== 'HEAD'
           const request = new Request(origin + req.url, {
             method: req.method,
-            headers: req.headers as Record<string, string>,
+            headers,
             body: hasBody ? (Readable.toWeb(req) as ReadableStream) : undefined,
             duplex: hasBody ? 'half' : undefined,
           } as RequestInit)
@@ -36,7 +44,11 @@ function phoneMockApi(): Plugin {
             Response.json({ error: { code: 'NOT_FOUND', message: 'No mock for this endpoint yet.' } }, { status: 404 })
 
           res.statusCode = response.status
-          response.headers.forEach((value, key) => res.setHeader(key, value))
+          // HTTP/2 forbids connection-level headers in a response.
+          const notAllowed = new Set(['connection', 'keep-alive', 'transfer-encoding', 'upgrade', 'proxy-connection'])
+          response.headers.forEach((value, key) => {
+            if (!notAllowed.has(key)) res.setHeader(key, value)
+          })
           res.end(Buffer.from(await response.arrayBuffer()))
         } catch (error) {
           next(error)
