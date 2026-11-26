@@ -58,18 +58,25 @@ function phoneMockApi(): Plugin {
   }
 }
 
+/** Where the real backend runs on this computer (backend/.env PORT, README). */
+const LOCAL_BACKEND = 'http://localhost:3000'
+
 // https://vite.dev/config/
-// `npm run dev:phone` uses mode "phone" for testing the QR check-in on a phone (H23):
+// Phone modes, for testing the QR check-in on a phone (H23):
 // - HTTPS with a self-signed certificate, because a phone's browser gives the camera only to a secure page;
 // - host: true, so the phone can open https://<this computer's IP>:5173 on the same Wi-Fi;
-// - the API address is relative (/api/v1, same address as the page) and is answered by phoneMockApi() above,
-//   so the browser's Service Worker mock is switched off. When the real backend exists, phone mode needs
-//   a Vite proxy to it instead: [TBD with Erol, H19].
+// - the API address is relative (/api/v1, same address as the page), so the browser's Service Worker mock is off.
+// `npm run dev:phone`      (mode "phone"):     /api/v1 is answered by phoneMockApi() above (no backend needed).
+// `npm run dev:phone:api`  (mode "phone-api"): /api/v1 is forwarded (proxy) to the real backend on this computer.
+//   The phone talks only to Vite; Vite passes each request on to localhost:3000 and the answer back.
 export default defineConfig(({ mode }) => {
-  const phone = mode === 'phone'
+  const realApi = mode === 'phone-api'
+  const phone = mode === 'phone' || realApi
   return {
-    plugins: [react(), ...(phone ? [basicSsl(), phoneMockApi()] : [])],
-    server: phone ? { host: true } : undefined,
+    plugins: [react(), ...(phone ? [basicSsl()] : []), ...(mode === 'phone' ? [phoneMockApi()] : [])],
+    server: phone
+      ? { host: true, proxy: realApi ? { [API_PREFIX]: { target: LOCAL_BACKEND } } : undefined }
+      : undefined,
     define: phone
       ? {
           'import.meta.env.VITE_API_URL': JSON.stringify(API_PREFIX),

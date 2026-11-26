@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "vite",
     "dev:phone": "vite --mode phone",
+    "dev:phone:api": "vite --mode phone-api",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"

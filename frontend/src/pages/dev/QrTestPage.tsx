@@ -1,19 +1,26 @@
 import { BrowserQRCodeSvgWriter } from '@zxing/browser'
 import { useEffect, useRef } from 'react'
+import { useSearchParams } from 'react-router'
 import { DEMO_DOOR } from '../../mocks/db'
 
-// Development only (H23): shows the demo door's QR code on the computer screen,
-// so a phone can scan it on the Check-in page. Not part of the app; the route exists only in `npm run dev`.
+// Development only (H23): shows a door QR code on the computer screen, so a phone can scan it
+// on the Check-in page. Not part of the app; the route exists only in `npm run dev*`.
+// - /dev/qr-test                                   the mock API's demo door
+// - /dev/qr-test?text=<qrToken>&name=<room>&code=<6 digits>   a real door from the backend
+//   (an admin sees qrToken and checkInCode in GET /admin/resources, E17)
 
 export default function QrTestPage() {
+  const [params] = useSearchParams()
+  const text = params.get('text') ?? DEMO_DOOR.qrToken
+  const name = params.get('name') ?? DEMO_DOOR.resource.name
+  const code = params.get('code') ?? DEMO_DOOR.checkInCode
   const boxRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const box = boxRef.current
     if (!box) return
-    const svg = new BrowserQRCodeSvgWriter().write(DEMO_DOOR.qrToken, 260, 260)
-    box.replaceChildren(svg)
-  }, [])
+    box.replaceChildren(new BrowserQRCodeSvgWriter().write(text, 260, 260))
+  }, [text])
 
   return (
     <main className="auth-page">
@@ -22,9 +29,9 @@ export default function QrTestPage() {
         <p>Scan this with the Check-in page on your phone.</p>
         <div ref={boxRef} className="dev-qr" />
         <p>
-          {DEMO_DOOR.resource.name} · 6-digit code: <strong>{DEMO_DOOR.checkInCode}</strong>
+          {name} · 6-digit code: <strong>{code}</strong>
         </p>
-        <p className="field-hint">QR text: {DEMO_DOOR.qrToken}</p>
+        <p className="field-hint">QR text: {text}</p>
       </div>
     </main>
   )
