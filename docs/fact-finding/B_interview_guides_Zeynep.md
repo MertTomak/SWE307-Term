@@ -92,6 +92,14 @@ Other sections depend on these figures. If the interviewee gives a range ("5–1
 | N3 | Tek bir talebi baştan sona işlemek (talebi almak, takvime bakmak, onaylamak, kaydetmek) size kaç dakika sürüyor? | How many minutes does it take you to handle one request from start to end (receive, check the calendar, confirm, record)? | 5.11 C15 (decisive parameter; NPV changes sign between 8 and 10 minutes) |
 | N4 | Yapılan ayırmaların yaklaşık yüzde kaçında kimse gelmiyor? | Roughly what percentage of bookings end with nobody showing up? | 5.11 C16 (no-show rate) |
 | N5 | Derslikler ve lablar günün hangi saatleri arasında kullanıma açık? Hafta sonu açık mı? | Between which hours of the day are rooms and labs open for use? Are they open at weekends? | HANDOFFS H08 (occupancy rate in the usage report) |
+| N6 | Rezervasyon ve ödünç işlerine (talepleri almak, takvim tutmak, onaylamak, kayıt) haftada toplam kaç saat ayırıyorsunuz? | In total, how many hours a week do you spend on booking and loan work (receiving requests, keeping the calendar, approving, recording)? | 5.11 C15 (cross-check of N2 × N3) |
+
+**Team questions on rule R9 (HANDOFFS H09).** Ask for the interviewee's view; the final rule is decided by the team with this view as evidence.
+
+| No. | Question (Turkish) | English translation | Needed for |
+|---|---|---|---|
+| P1 | Bir öğrenci 30 gün içinde 3 kez gelmeyip 7 gün yasak aldıysa, yasak bittikten sonra bu 3 gelmeme bir sonraki yasak için tekrar sayılmalı mı, yoksa sayaç sıfırlanmalı mı? | If a student got a 7-day ban for 3 no-shows in 30 days, should those 3 no-shows count again towards the next ban after the ban ends, or should the count start from zero? | H09 (a) |
+| P2 | "Son 30 gün" sizce rezervasyonun başlangıç saatinden mi, yoksa gelmeme kaydının düştüğü andan mı sayılmalı? | Should "the last 30 days" be counted from the start time of the reservation, or from the moment the no-show was recorded? | H09 (b) |
 
 ## 6. Interview record template (one copy per interview)
 
@@ -109,7 +117,7 @@ Other sections depend on these figures. If the interviewee gives a range ("5–1
 
 **Key findings (3–5 bullet points):** [TBD]
 
-**Numbers (answers to N1–N5 in Section 5):** N1 [TBD] · N2 [TBD] · N3 [TBD] · N4 [TBD] · N5 [TBD]
+**Numbers and team questions (Section 5):** N1 [TBD] · N2 [TBD] · N3 [TBD] · N4 [TBD] · N5 [TBD] · N6 [TBD] · P1 [TBD] · P2 [TBD]
 
 **Documents obtained:** list with DOC IDs from Appendix D. [TBD]
 
