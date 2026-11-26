@@ -38,6 +38,11 @@ export function QrScanner({ onScan, active }: QrScannerProps) {
     onScanRef.current = onScan
   })
 
+  // Camera starts run one after another. Why: the library's stop() also empties the <video> element.
+  // If an old start is stopped after a new start has put its picture there, the screen goes black.
+  // This happens in development, where React StrictMode runs every effect twice (start, clean up, start).
+  const previousRun = useRef<Promise<void>>(Promise.resolve())
+
   useEffect(() => {
     const video = videoRef.current
     if (!active || !video || !cameraPossible()) return
@@ -47,37 +52,40 @@ export function QrScanner({ onScan, active }: QrScannerProps) {
     // Try to read a frame every 200 ms: fast enough for a person, light on the phone's battery.
     const reader = new BrowserQRCodeReader(undefined, { delayBetweenScanAttempts: 200 })
 
-    reader
-      .decodeFromConstraints(
-        // "environment" = the back camera of a phone. A laptop has only one camera and uses that.
-        { video: { facingMode: { ideal: 'environment' } }, audio: false },
-        video,
-        (result, _error, scanControls) => {
-          // Called for every frame. `result` is undefined while no QR code is in the picture.
-          if (!result || finished) return
-          finished = true
-          scanControls.stop()
-          setRunning(false)
-          onScanRef.current(result.getText())
-        },
-      )
-      .then((started) => {
+    // Wait until the previous camera is fully stopped, then start this one.
+    const run = previousRun.current.then(async () => {
+      if (finished) return // cleaned up before it could start: do not ask for the camera at all
+      try {
+        const started = await reader.decodeFromConstraints(
+          // "environment" = the back camera of a phone. A laptop has only one camera and uses that.
+          { video: { facingMode: { ideal: 'environment' } }, audio: false },
+          video,
+          (result, _error, scanControls) => {
+            // Called for every frame. `result` is undefined while no QR code is in the picture.
+            if (!result || finished) return
+            finished = true
+            scanControls.stop()
+            setRunning(false)
+            onScanRef.current(result.getText())
+          },
+        )
         if (finished) started.stop() // the page was left (or a code was read) before the camera was ready
         else {
           controls = started
           setRunning(true)
           setProblem(null)
         }
-      })
-      .catch((error: unknown) => {
+      } catch (error) {
         if (!finished) setProblem(cameraProblem(error))
-      })
+      }
+    })
 
     // Clean-up: runs when `active` turns false or the page is left. Turns the camera light off.
+    // The next start waits for this stop (previousRun).
     return () => {
       finished = true
-      controls?.stop()
       setRunning(false)
+      previousRun.current = run.then(() => controls?.stop())
     }
   }, [active])
 
