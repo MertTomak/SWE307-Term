@@ -66,6 +66,10 @@ npm run dev                   # API on http://localhost:3000/api/v1 with auto-re
 | `npm run db:local` | Local PostgreSQL without Docker (development only) |
 | `npx prisma studio` | Browse the database in the browser |
 
+## Deploying the demo
+
+Neon (database) → Render (API) → Vercel (frontend), step by step: [`DEPLOY.md`](DEPLOY.md).
+
 ## How we work
 
 1. **Pushing directly to `main` is allowed** (team decision, 23 Nov 2026). Always run `git pull --ff-only` before you push, so you do not overwrite someone else's work.
